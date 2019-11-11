@@ -1,0 +1,155 @@
+{
+  "$id": "http://example.com/example.json",
+  "type": "object",
+  "title": "Okr",
+  "limit": 100,
+  "maxLimit": 500,
+  "key": "okr",
+
+  "namespace": "organizacion",
+
+  "restricted": [],
+  "properties": {
+    "id": {
+      "$id": "/properties/id",
+      "type": "integer",
+      "title": "Id",
+      "filterable": true,
+      "sortable": true
+    },
+    "name": {
+      "$id": "/properties/name",
+      "type": "string",
+      "title": "Titulo",
+      "filterable": true,
+      "width": 380
+    },
+    "objective": {
+      "$id": "/properties/objective",
+      "type": "string",
+      "title": "Objetivo",
+      "filterable": true,
+      "sortable": true,
+      "width": 500
+    },
+    "metric": {
+      "$id": "/properties/metric",
+      "type": "string",
+      "title": "Metric",
+      "filterable": true,
+      "sortable": true
+    },
+    "departamento": {
+      "$id": "/properties/departamento",
+      "type": "string",
+      "title": "Departamento",
+      "filterable": true,
+      "sortable": true,
+      "filterRenderer": "SelectFilter",
+      "element": "select",
+      "editable": true,
+      "enum": ["ventas", "credito", "mercadeo", "logistica", "operaciones", "gerencia", "contabilidad"],
+      "width": 150
+    },
+    "fechaInicio": {
+      "$id": "/properties/fechaInicio",
+      "type": "string",
+      "title": "Fecha Inicio",
+      "formatter": "DateFormatter",
+      "filterRenderer": "DateFilter",
+      "filterable": true,
+      "sortable": true
+    },
+    "fechaFin": {
+      "$id": "/properties/fechaFin",
+      "type": "string",
+      "title": "Fecha Fin",
+      "formatter": "DateFormatter",
+      "filterRenderer": "DateFilter",
+      "filterable": true,
+      "sortable": true
+    },
+
+    "progress": {
+      "$id": "/properties/progress",
+      "type": "number",
+      "title": "Avance",
+      "filterable": true,
+      "sortable": true,
+      "editable": true
+    },
+
+    "kr": {
+      "isJSON": true,
+      "width": 100,
+      "title": "Resultado Clave",
+      "formatter": "ChildFormatter",
+      "fields": ["name", "key", "result", "progress"],
+      "editables": ["name", "key", "result", "progress"],
+      "idField": "krId",
+      "element": "table",
+      "type": "string",
+      "items": {
+        "type": "object"
+      }
+    },
+    "okrId": {
+      "$id": "/properties/okrId",
+      "type": "integer",
+      "title": "Pertenece a",
+      "table": "okr",
+      "tableAlias": "parentOkr",
+      "route": "okr/findLikeName",
+      "element": "autocomplete",
+      "filterable": true,
+      "elementOptions": {
+        "primary": "name"
+      },
+      "width": 200
+    },
+    "ownerId": {
+      "$id": "/properties/ownerId",
+      "type": "integer",
+      "title": "Propietario",
+      "table": "owner",
+      "filterable": true,
+      "sortable": true,
+      "route": "owner/findLikeName",
+      "metadataType": "owner",
+      "element": "autocomplete",
+      "elementOptions": {
+        "primary": "name"
+      },
+      "width": 250
+    }
+  },
+  "belongsTo": ["okr", "owner"],
+  "actions": ["Ver", "Crear", "Editar", "Borrar"],
+  "layout": [
+    {
+      "title": "Información",
+      "cols": 12,
+      "fields": ["name", "okrId", "fechaInicio", "fechaFin", "progress", "ownerId"]
+    },
+    {
+      "title": "Detalles",
+      "cols": 12,
+      "fieldSize": 12,
+      "fields": ["departamento"]
+    }
+  ],
+  "table": {
+    "sum": [],
+    "fields": [
+      "id",
+      "name",
+      "okrId",
+      "metric",
+      "progress",
+      "fechaInicio",
+      "fechaFin",
+      "departamento",
+      "ownerId"
+    ]
+  }
+}

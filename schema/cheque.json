@@ -1,0 +1,155 @@
+{
+  "$id": "http://example.com/example.json",
+  "type": "object",
+  "title": "Cheques",
+  "key": "cheque",
+  "namespace": "credito",
+  "restricted": [],
+  "properties": {
+    "id": {
+      "$id": "/properties/id",
+      "type": "integer",
+      "title": "Id"
+    },
+    "estado": {
+      "$id": "/properties/estado",
+      "type": "string",
+      "title": "Estado",
+      "element": "select",
+      "filterable": true,
+      "editable": true,
+      "width": 160,
+      "enum": ["por depositar", "por esperar", "por confirmar", "archivado"]
+    },
+    "descripcion": {
+      "$id": "/properties/descripcion",
+      "type": "string",
+      "title": "Descripcion",
+      "filterable": true,
+      "editable": true,
+      "width": 300
+    },
+    "banco": {
+      "$id": "/properties/banco",
+      "type": "string",
+      "title": "Banco",
+      "element": "select",
+      "filterable": true,
+      "defaultTo": "Nacional",
+      "enum": ["Nacional", "Costa Rica", "BAC", "BCT", "Popular", "Scotiabank", "DaVivienda"]
+    },
+    "moneda": {
+      "$id": "/properties/moneda",
+      "type": "string",
+      "title": "Moneda",
+      "element": "select",
+      "filterable": true,
+      "defaultTo": "CRC",
+      "default": "CRC",
+      "enum": ["CRC", "USD"]
+    },
+    "referencia": {
+      "$id": "/properties/referencia",
+      "type": "string",
+      "title": "Referencia",
+      "filterable": true,
+      "formatter": "TextFormatter",
+      "width": 200
+    },
+    "fechaDeposito": {
+      "$id": "/properties/fechaDeposito",
+      "type": "string",
+      "title": "Depositar",
+      "element": "date",
+      "filterable": true,
+      "filterRenderer": "DateFilter",
+      "sortable": true,
+      "editable": true
+    },
+    "fecha": {
+      "$id": "/properties/fecha",
+      "type": "string",
+      "title": "Fecha",
+      "element": "date",
+      "filterable": true,
+      "filterRenderer": "DateFilter",
+      "sortable": true
+    },
+    "clienteId": {
+      "$id": "/properties/clienteId",
+      "type": "integer",
+      "title": "Cliente",
+      "table": "cliente",
+      "metadataType": "cliente",
+      "filterable": true,
+      "route": "cliente/findLikeName",
+      "element": "autocomplete",
+      "width": 250,
+      "elementOptions": {
+        "primary": "name"
+      }
+    },
+
+    "monto": {
+      "$id": "/properties/monto",
+      "type": "number",
+      "title": "Monto"
+    },
+    "createdBy": {
+      "$id": "/properties/createdBy",
+      "type": "string",
+      "title": "Creado por"
+    },
+    "updatedBy": {
+      "$id": "/properties/updatedBy",
+      "type": "string",
+      "title": "Actualizado por"
+    },
+    "createdAt": {
+      "$id": "/properties/createdAt",
+      "type": "string",
+      "title": "Creado"
+    },
+    "updatedAt": {
+      "$id": "/properties/updatedAt",
+      "type": "string",
+      "title": "Actualizado"
+    }
+  },
+  "belongsTo": ["cliente"],
+  "actions": ["Crear", "Editar"],
+  "layout": [
+    {
+      "title": "Información",
+      "cols": 4,
+      "fields": ["clienteId", "estado"]
+    },
+    {
+      "title": "Cheque",
+      "cols": 4,
+      "fields": ["banco", "referencia", "fecha", "fechaDeposito"]
+    },
+    {
+      "title": "Monto",
+      "cols": 4,
+      "fields": ["moneda", "monto"]
+    }
+  ],
+  "table": {
+    "sum": ["monto"],
+    "fields": [
+      "id",
+      "clienteId",
+      "estado",
+      "fecha",
+      "fechaDeposito",
+      "referencia",
+      "banco",
+      "fecha",
+      "moneda",
+      "monto",
+      "descripcion"
+    ]
+  },
+  "batch": []
+}

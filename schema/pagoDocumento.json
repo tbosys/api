@@ -1,0 +1,375 @@
+{
+  "$id": "http://example.com/example.json",
+  "type": "object",
+  "key": "pagoDocumento",
+  "limit": 100,
+  "maxLimit": 10000,
+  "shareLevel": 5,
+  "namespace": "credito",
+  "title": "Pagos de Documentos",
+  "restricted": ["proveedorId", "referencia", "moneda", "tipoCambio", "monto"],
+  "properties": {
+    "id": {
+      "$id": "/properties/id",
+      "type": "integer",
+      "title": "Id"
+    },
+    "clienteId": {
+      "$id": "/properties/clienteId",
+      "type": "integer",
+      "title": "Cliente",
+      "table": "cliente",
+      "filterable": true,
+      "route": "cliente/findLikeName",
+      "metadataType": "cliente",
+      "element": "autocomplete",
+      "width": 220,
+      "elementOptions": {
+        "primary": "name"
+      }
+    },
+    "comisiona": {
+      "$id": "/properties/comisiona",
+      "type": "boolean",
+      "title": "Comision",
+      "filterable": true,
+      "sortable": true,
+      "select": "owner.comisiona"
+    },
+    "tags": {
+      "$id": "/properties/tags",
+      "type": "integer",
+      "title": "Tag",
+      "table": "cliente",
+      "filterable": true,
+      "width": 350,
+      "select": "cliente.tags"
+    },
+    "contado": {
+      "width": 100,
+      "sortable": true,
+      "$id": "/properties/contado",
+      "type": "boolean",
+      "title": "Contado",
+      "filterable": true,
+      "filterRenderer": "BooleanFilter",
+      "formatter": "BooleanFormatter"
+    },
+    "estado": {
+      "$id": "/properties/estado",
+      "type": "string",
+      "title": "Estado",
+      "filterable": true,
+      "filterRenderer": "SelectFilter",
+      "enum": ["por aplicar", "archivado"]
+    },
+    "fechaIngreso": {
+      "$id": "/properties/fechaIngreso",
+      "type": "string",
+      "title": "Fecha Ingreso",
+      "filterable": true,
+      "filterRenderer": "DateTimeFilter",
+      "formatter": "DateTimeFormatter",
+      "sortable": true,
+      "width": 120
+    },
+    "fecha": {
+      "$id": "/properties/fecha",
+      "type": "string",
+      "title": "Fecha",
+      "filterable": true,
+      "filterRenderer": "DateFilter",
+      "sortable": true,
+      "width": 120
+    },
+    "recibo": {
+      "width": 100,
+      "sortable": true,
+      "$id": "/properties/recibo",
+      "type": "integer",
+      "title": "Recibo",
+      "filterable": true
+    },
+    "consecutivo": {
+      "width": 100,
+      "sortable": true,
+      "$id": "/properties/consecutivo",
+      "type": "integer",
+      "title": "Consecutivo",
+      "filterable": true
+    },
+    "referencia": {
+      "$id": "/properties/referencia",
+      "type": "string",
+      "title": "Referencia",
+      "filterable": true
+    },
+    "moneda": {
+      "width": 90,
+      "$id": "/properties/moneda",
+      "type": "string",
+      "title": " Moneda",
+      "filterable": true,
+      "filterRenderer": "SelectFilter",
+      "enum": ["CRC", "USD"],
+      "element": "select",
+      "default": "CRC"
+    },
+    "formaPago": {
+      "$id": "/properties/formaPago",
+      "type": "string",
+      "title": "Forma de Pago",
+      "filterable": true,
+      "filterRenderer": "SelectFilter",
+      "enum": [
+        "deposito",
+        "cheque",
+        "transferencia",
+        "tarjeta",
+        "efectivo",
+        "nota credito",
+        "nota debito",
+        "reversion"
+      ],
+      "element": "select",
+      "default": "transferencia"
+    },
+    "tipoCambio": {
+      "$id": "/properties/tipoCambio",
+      "type": "number",
+      "title": "Tipo de cambio",
+      "default": 1
+    },
+    "monto": {
+      "$id": "/properties/monto",
+      "type": "number",
+      "title": "Monto",
+      "readOnly": true,
+      "filterRenderer": "NumericFilter",
+      "filterable": true,
+      "sortable": true
+    },
+    "montoPendiente": {
+      "$id": "/properties/montoPendiente",
+      "type": "number",
+      "title": "Monto Pendiente",
+      "filterRenderer": "NumericFilter",
+      "filterable": true,
+      "sortable": true
+    },
+    "approveBy": {
+      "$id": "/properties/approveBy",
+      "type": "integer",
+      "title": "Aprovado Por "
+    },
+    "ownerId": {
+      "$id": "/properties/ownerId",
+      "type": "integer",
+      "title": "Propietario",
+      "table": "owner",
+      "filterable": true,
+      "sortable": true,
+      "route": "owner/findLikeName",
+      "metadataType": "owner",
+      "element": "autocomplete",
+      "elementOptions": {
+        "primary": "name"
+      },
+      "width": 250
+    },
+
+    "createdBy": {
+      "$id": "/properties/createdBy",
+      "type": "string",
+      "filterable": true,
+      "title": "Creado por",
+      "width": 110
+    },
+    "updatedBy": {
+      "$id": "/properties/updatedBy",
+      "type": "string",
+      "title": "Actualizado por"
+    },
+    "createdAt": {
+      "$id": "/properties/createdAt",
+      "type": "string",
+      "title": "Creado"
+    },
+    "updatedAt": {
+      "$id": "/properties/updatedAt",
+      "type": "string",
+      "title": "Actualizado"
+    },
+    "lineaPagoDocumento": {
+      "isJSON": true,
+      "width": 100,
+      "title": "Documentos por Aplicar",
+      "route": "saldo/findByClienteForPago",
+      "formatter": "ChildFormatter",
+      "parentKey": "clienteId",
+      "valueKey": "total",
+      "plazoKey": "plazoActual",
+      "consecutivoKey": "consecutivo",
+      "map": [
+        {
+          "_saldoId": "id"
+        },
+        {
+          "documentoId": "documentoId"
+        },
+        {
+          "consecutivo": "consecutivo"
+        },
+        {
+          "tipoDocumento": "tipo"
+        },
+        {
+          "plazoDocumento": "plazo"
+        },
+        {
+          "documentoId": "documentoId"
+        },
+        {
+          "moneda": "moneda"
+        },
+        {
+          "tipoCambio": "tipoCambio"
+        },
+        {
+          "monto": "total"
+        },
+        {
+          "_saldo": "total"
+        }
+      ],
+      "fields": ["consecutivo", "monto", "tipoDocumento"],
+      "editables": ["monto"],
+      "idField": "documentoId",
+      "element": "billingSelector",
+      "type": "string",
+      "items": {
+        "type": "object"
+      }
+    },
+    "vendedorId": {
+      "sortable": true,
+      "$id": "/properties/vendedorId",
+      "type": "integer",
+      "title": "Vendedor",
+      "table": "vendedor",
+      "metadataType": "vendedor",
+      "filterable": true,
+      "route": "vendedor/findLikeName",
+      "element": "autocomplete",
+      "width": 100,
+      "elementOptions": {
+        "primary": "name"
+      }
+    }
+  },
+  "belongsTo": ["cliente", "owner"],
+  "required": ["referencia"],
+  "actions": [
+    "Ver",
+    "Crear",
+    "Editar",
+    "Aprobar",
+    "Aplicar",
+    "Revertir",
+    {
+      "title": "Imprimir",
+      "then": "openUrl",
+      "icon": "Imprimir"
+    },
+    "Borrar"
+  ],
+  "view": {
+    "fields": [
+      "id",
+      "consecutivo",
+      "recibo",
+      "clienteId",
+      "fecha",
+      "ownerId",
+      "monto",
+      "montoPendiente",
+      "fechaIngreso",
+      "estado",
+      "contado",
+      "createdBy",
+      "referencia",
+      "moneda",
+      "formaPago",
+      "tipoCambio",
+      "tags"
+    ],
+    "fullFields": ["lineaPagoDocumento"],
+    "relatedFields": [
+      {
+        "route": "lineaPagoDocumento/query",
+        "key": "lineaPagoDocumento",
+        "title": "Pagos Aplicados",
+        "table": "lineaPagoDocumento",
+        "fields": [
+          "id",
+          "documentoId",
+          "consecutivo",
+          "fecha",
+          "tipo",
+          "diasCredito",
+          "plazoDocumento",
+          "monto",
+          "montoPendiente",
+          "moneda"
+        ],
+        "filters": [["lineaPagoDocumento.pagoDocumentoId", "=", "$"]]
+      }
+    ]
+  },
+  "layout": [
+    {
+      "title": "Información",
+      "cols": 6,
+      "fields": ["clienteId", "recibo"]
+    },
+    {
+      "title": "Información",
+      "cols": 6,
+      "fields": ["formaPago", "referencia", "monto"]
+    },
+    {
+      "title": "Documentos",
+      "cols": 12,
+      "fieldSize": 12,
+      "fields": ["lineaPagoDocumento"]
+    },
+    {
+      "title": "Otros",
+      "cols": 12,
+
+      "fields": ["moneda", "tipoCambio"]
+    }
+  ],
+  "table": {
+    "sum": ["monto"],
+    "fields": [
+      "id",
+      "consecutivo",
+      "recibo",
+      "clienteId",
+      "fecha",
+      "ownerId",
+      "monto",
+      "fechaIngreso",
+      "estado",
+      "contado",
+      "createdBy",
+      "referencia",
+      "moneda",
+      "formaPago",
+      "tipoCambio",
+      "tags",
+      "comisiona"
+    ]
+  }
+}

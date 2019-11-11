@@ -1,0 +1,159 @@
+{
+  "$id": "http://example.com/example.json",
+  "type": "object",
+  "title": "Notas Financieras",
+  "key": "nota",
+  "namespace": "credito",
+  "shareLevel": 5,
+  "maxLimit": 20000,
+  "restricted": [],
+  "properties": {
+    "id": {
+      "$id": "/properties/id",
+      "type": "integer",
+      "title": "Id",
+      "locked": true
+    },
+    "estado": {
+      "$id": "/properties/estado",
+      "type": "string",
+      "title": "Estado",
+      "filterable": true,
+      "filterRenderer": "SelectFilter",
+      "width": 100,
+      "default": "por aprobar",
+      "enum": ["por aprobar", "archivado"]
+    },
+    "tipo": {
+      "$id": "/properties/tipo",
+      "type": "string",
+      "title": "Tipo",
+      "element": "select",
+      "filterRenderer": "SelectFilter",
+      "filterable": true,
+      "default": "NC",
+      "enum": ["ND", "NC"]
+    },
+
+    "descripcion": {
+      "$id": "/properties/descripcion",
+      "type": "string",
+      "element": "textArea",
+      "title": "Descripcion",
+      "width": 300,
+      "formatter": "TextFormatter"
+    },
+
+    "documentoInterno": {
+      "$id": "/properties/documentoInterno",
+      "type": "boolean",
+      "element": "boolean",
+      "title": "Interna",
+      "width": 100,
+      "formatter": "BooleanFormatter"
+    },
+
+    "totalComprobante": {
+      "$id": "/properties/totalComprobante",
+      "type": "number",
+      "limit": 100,
+      "maxLimit": 5000,
+      "title": "Total",
+      "sortable": true
+    },
+    "moneda": {
+      "$id": "/properties/moneda",
+      "type": "string",
+      "title": "moneda",
+      "enum": ["CRC", "USD"],
+      "element": "select",
+      "filterRenderer": "SelectFilter",
+      "filterable": true,
+      "default": "CRC"
+    },
+    "tipoCambio": {
+      "$id": "/properties/tipoCambio",
+      "type": "number",
+      "title": "tipoCambio",
+      "default": 1
+    },
+    "approveBy": {
+      "$id": "/properties/approveBy",
+      "type": "string",
+      "title": "Aprobado por"
+    },
+    "clienteId": {
+      "$id": "/properties/clienteId",
+      "type": "integer",
+      "title": "Cliente",
+      "table": "cliente",
+      "filterable": true,
+      "route": "cliente/findLikeName",
+      "metadataType": "cliente",
+      "element": "autocomplete",
+      "elementOptions": {
+        "primary": "name"
+      },
+      "width": 220
+    },
+    "ownerId": {
+      "$id": "/properties/ownerId",
+      "type": "integer",
+      "title": "Propietario"
+    },
+    "ownerName": {
+      "$id": "/properties/ownerName",
+      "type": "string",
+      "title": "Nombre Propietario"
+    },
+    "createdBy": {
+      "$id": "/properties/createdBy",
+      "type": "string",
+      "title": "Creado por"
+    },
+    "updatedBy": {
+      "$id": "/properties/updatedBy",
+      "type": "string",
+      "title": "Actualizado por"
+    },
+    "createdAt": {
+      "$id": "/properties/createdAt",
+      "type": "string",
+      "title": "Creado"
+    },
+    "updatedAt": {
+      "$id": "/properties/updatedAt",
+      "type": "string",
+      "title": "Actualizado"
+    }
+  },
+  "actions": ["Crear", "Borrar", "Aprobar"],
+  "belongsTo": ["cliente"],
+  "required": ["clienteId", "descripcion", "tipoCambio", "tipo", "totalComprobante", "moneda"],
+  "layout": [
+    {
+      "title": "Información",
+      "cols": 4,
+      "fields": ["clienteId", "tipo", "documentoInterno", "descripcion"]
+    },
+    {
+      "cols": 8,
+      "title": "Totales",
+      "fields": ["totalComprobante", "tipoCambio", "moneda"]
+    }
+  ],
+  "table": {
+    "sum": ["totalComprobante"],
+    "fields": [
+      "id",
+      "clienteId",
+      "estado",
+      "tipo",
+      "documentoInterno",
+      "totalComprobante",
+      "descripcion",
+      "tipoCambio",
+      "moneda"
+    ]
+  }
+}

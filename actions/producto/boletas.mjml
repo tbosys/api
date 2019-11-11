@@ -1,0 +1,29 @@
+<mjml>
+
+  <mj-head>
+    <!--FONTS-->
+    <mj-attributes>
+      <!-- This sets the global font of the template to FSBlakeLight and adds fallbacks. -->
+      <mj-all font-family="'ProximaNova', 'Helvetica', Arial, sans-serif;" />
+    </mj-attributes>
+    <!--INLINE CSS-->
+    <mj-style inline="inline">
+      body{background-color: #fff; width:100%; page-break: auto} 
+      dd{ display: inline-block;} 
+      .producto-name{ font-size: 14px; text-transform: uppercase;} 
+      .box{height:290px; border-style: groove; margin:5px; width: 40%; text-align:center} 
+    </mj-style>
+  </mj-head>
+  <mj-body margin="0">
+        {{#each productos}}
+        <mj-text  font-size="50px">
+                <dd class="box">
+                    <text class="producto-name">{{name1}}</text>
+                </dd>
+                <dd class="box">
+                    <text class="producto-name">{{name2}}</text>
+                </dd>
+        </mj-text>
+        {{/each}}
+  </mj-body>
+</mjml>

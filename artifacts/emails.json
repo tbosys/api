@@ -1,0 +1,8 @@
+{
+  "Template": {
+    "TemplateName": "login_access_code",
+    "SubjectPart": "Codigo de Acceso",
+    "HtmlPart": "<h1>Hola,</h1><p>Su codigo para hacer login es {{code}}.</p>",
+    "TextPart": "Hola,\rSu codigo para hacer login es {{code}}."
+  }
+}

@@ -1,0 +1,308 @@
+{
+  "$id": "http://example.com/example.json",
+  "type": "object",
+  "limit": 100,
+  "maxLimit": 5000,
+  "namespace": "cxp",
+  "key": "registroRecibido",
+  "restricted": [],
+  "multiRowAction": true,
+  "properties": {
+    "id": {
+      "$id": "/properties/id",
+      "type": "integer",
+      "title": "Id"
+    },
+    "tipo": {
+      "$id": "/properties/tipo",
+      "type": "string",
+      "title": "Tipo",
+      "width": 220,
+      "filterable": true
+    },
+    "pdf": {
+      "$id": "/properties/pdf",
+      "type": "string",
+      "title": "pdf",
+      "width": 240,
+      "formatter": "LinkFormatter",
+      "prefix": "http://facturas.efactura.io/"
+    },
+    "xml": {
+      "$id": "/properties/xml",
+      "type": "string",
+      "title": "xml",
+      "width": 240,
+      "formatter": "LinkFormatter",
+      "prefix": "http://facturas.efactura.io/"
+    },
+
+    "attachments": {
+      "$id": "/properties/attachments",
+      "type": "string",
+      "title": "Archivos",
+      "prefix": "https://emails.efactura.io/",
+      "isJSON": true,
+      "formatter": "FileListFormatter",
+      "width": 130
+    },
+
+    "parsedXmls": {
+      "$id": "/properties/parsedXmls",
+      "type": "string",
+      "title": "parsedXmls",
+      "isJSON": true
+    },
+
+    "emisor": {
+      "$id": "/properties/emisor",
+      "type": "string",
+      "title": "emisor",
+      "isJSON": true
+    },
+
+    "receptor": {
+      "$id": "/properties/receptor",
+      "type": "string",
+      "title": "receptor",
+      "isJSON": true
+    },
+    "validate": {
+      "$id": "/properties/validate",
+      "type": "string",
+      "title": "Errores",
+      "isJSON": true,
+      "width:": 350
+    },
+
+    "mensajeHaciendaXml": {
+      "$id": "/properties/mensajeHaciendaXml",
+      "type": "string",
+      "title": "mensajeHaciendaXml",
+      "isJSON": true
+    },
+
+    "documentoElectronicoXml": {
+      "$id": "/properties/documentoElectronicoXml",
+      "type": "string",
+      "title": "documentoElectronicoXml",
+      "isJSON": true
+    },
+
+    "totalComprobante": {
+      "$id": "/properties/totalComprobante",
+      "type": "number",
+      "title": "Total",
+      "editable": true,
+      "width": 150
+    },
+    "tipoCambio": {
+      "$id": "/properties/tipoCambio",
+      "type": "number",
+      "title": "Tipo Cambio",
+      "width": 150,
+      "editable": true
+    },
+    "impuesto": {
+      "$id": "/properties/impuesto",
+      "type": "number",
+      "title": "Impuesto",
+      "width": 150,
+      "editable": true
+    },
+    "moneda": {
+      "$id": "/properties/moneda",
+      "type": "string",
+      "title": "Moneda",
+      "enum": ["USD", "CRC"],
+      "element": "select",
+      "editable": true,
+      "width": 80
+    },
+    "descripcion": {
+      "$id": "/properties/descripcion",
+      "type": "string",
+      "title": "descripcion",
+      "width": 240,
+      "editable": true
+    },
+    "respuestaXml": {
+      "$id": "/properties/respuestaXml",
+      "type": "string",
+      "title": "respuestaXml",
+      "width": 240,
+      "formatter": "LinkFormatter",
+      "prefix": "http://facturas.efactura.io/"
+    },
+    "mensajeXml": {
+      "$id": "/properties/mensajeXml",
+      "type": "string",
+      "title": "mensajeXml",
+      "width": 240,
+      "formatter": "LinkFormatter",
+      "prefix": "http://facturas.efactura.io/"
+    },
+    "clave": {
+      "$id": "/properties/clave",
+      "type": "string",
+      "title": "Clave",
+      "width": 150,
+      "filterable": true,
+      "editable": true
+    },
+    "to": {
+      "$id": "/properties/to",
+      "type": "string",
+      "title": "To",
+      "width": 200
+    },
+    "from": {
+      "$id": "/properties/from",
+      "type": "string",
+      "title": "Emisor",
+      "filterable": true,
+      "width": 160,
+      "editable": true,
+      "fixed": true,
+      "locked": true
+    },
+    "aprobadoPorResponsable": {
+      "$id": "/properties/aprobadoPorResponsable",
+      "type": "boolean",
+      "title": "Aprobado",
+      "editable": true,
+      "sortable": true,
+      "filterable": true,
+      "width": 100
+    },
+    "porPagar": {
+      "$id": "/properties/porPagar",
+      "type": "boolean",
+      "title": "Por Pagar",
+      "editable": true,
+      "sortable": true,
+      "filterable": true
+    },
+    "completo": {
+      "$id": "/properties/completo",
+      "type": "boolean",
+      "title": "Completo",
+      "filterable": true
+    },
+    "emailId": {
+      "$id": "/properties/emailId",
+      "type": "string",
+      "title": "Email Id",
+      "width": 250,
+      "formatter": "LinkFormatter",
+      "prefix": "http://facturas.efactura.io/emails/"
+    },
+    "archivos": {
+      "$id": "/properties/archivos",
+      "type": "string",
+      "title": "Archivos"
+    },
+    "estado": {
+      "$id": "/properties/estado",
+      "type": "string",
+      "title": "Estado",
+      "filterable": true,
+      "enum": [
+        "error",
+        "por completar",
+        "por aprobar",
+        "por aceptar",
+        "por ingresar",
+        "por procesar",
+        "por recibir",
+        "por enviar",
+        "por revisar",
+        "por archivar",
+        "archivado"
+      ]
+    },
+    "respuestaHacienda": {
+      "$id": "/properties/respuestaHacienda",
+      "type": "string",
+      "title": "respuestaHacienda",
+      "width": 400
+    },
+    "createdAt": {
+      "$id": "/properties/createdAt",
+      "type": "string",
+      "title": "Creado",
+      "width": 300,
+      "filterable": true,
+      "filterRenderer": "DateTimeFilter"
+    },
+    "proveedorId": {
+      "$id": "/properties/proveedorId",
+      "type": "integer",
+      "title": "Proveedor",
+      "table": "proveedor",
+      "metadataType": "proveedor",
+      "route": "proveedor/findLikeName",
+      "element": "autocomplete",
+      "filterable": true,
+      "elementOptions": {
+        "primary": "name"
+      },
+      "lockOn": "*",
+      "width": 200,
+      "editable": true
+    },
+    "ownerId": {
+      "$id": "/properties/ownerId",
+      "type": "integer",
+      "title": "Responsable",
+      "table": "usuario",
+      "route": "login/usuario/findLikeName",
+      "element": "autocomplete",
+      "filterable": true,
+      "elementOptions": {
+        "primary": "name"
+      },
+      "lockOn": "*",
+      "width": 180,
+      "editable": true
+    }
+  },
+  "required": [],
+  "belongsTo": ["proveedor"],
+  "layout": [],
+  "actions": [
+    {
+      "title": "Ingresar",
+      "type": "modal",
+      "size": "xl"
+    },
+    "Aceptar",
+    "Rechazar",
+    "Archivar"
+  ],
+  "table": {
+    "sum": [],
+    "fields": [
+      "from",
+      "clave",
+      "estado",
+      "proveedorId",
+      "ownerId",
+      "aprobadoPorResponsable",
+      "completo",
+      "porPagar",
+      "validate",
+      "attachments",
+      "tipo",
+      "totalComprobante",
+      "impuesto",
+      "tipoCambio",
+      "moneda",
+      "descripcion",
+
+      "createdAt",
+      "respuestaHacienda",
+      "respuestaXml"
+    ]
+  }
+}

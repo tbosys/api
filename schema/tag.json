@@ -1,0 +1,48 @@
+{
+  "$id": "http://example.com/example.json",
+  "type": "object",
+  "key": "tag",
+  "title": "tag",
+  "limit": 40,
+  "maxLimit": 10000,
+  "namespace": "mercadeo",
+  "restricted": [],
+  "secure": false,
+  "properties": {
+    "id": {
+      "$id": "/properties/id",
+      "type": "integer",
+      "title": "Id"
+    },
+    "name": {
+      "$id": "/properties/name",
+      "type": "string",
+      "title": "Nombre",
+      "width": 250,
+      "filterable": true,
+      "editable": true
+    },
+    "descripcion": {
+      "$id": "/properties/name",
+      "type": "string",
+      "title": "Descripcion",
+      "width": 450,
+      "filterable": true,
+      "editable": true
+    }
+  },
+  "required": ["name"],
+  "layout": [
+    {
+      "title": "Información",
+      "cols": 6,
+      "fields": ["name", "descripcion"]
+    }
+  ],
+  "belongsTo": [],
+  "actions": ["Crear", "Editar"],
+  "table": {
+    "sum": [],
+    "fields": ["id", "name", "descripcion"]
+  }
+}

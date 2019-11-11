@@ -1,0 +1,161 @@
+<mjml>
+
+  <mj-head>
+    <!--FONTS-->
+    <mj-attributes>
+      <!-- This sets the global font of the template to FSBlakeLight and adds fallbacks. -->
+      <mj-all font-family="'ProximaNova', 'Helvetica', Arial, sans-serif;" />
+    </mj-attributes>
+    <!--INLINE CSS-->
+    <mj-style inline="inline">
+      body{background-color: #fff} .body{ backgroud-color: #fff; padding: 0, margin: 0, max-width: 1000px } ul { font-size:11px; list-style: none; padding: 0; margin: 0; } li{ margin-bottom: 5px; } li:first-child{ font-size: 15px; } dl{ font-size: 13px; margin:0;
+      padding: 0; } dt,dd{ list-style: none; display: inline-block; padding: 0; margin: 0; font-size: 13px; } dt{ width: 80px; line-height: 22px; } .small{ font-size: 11px; } .producto-name{ font-size: 13px; padding-left: 0; padding-bottom: 0; margin-bottom:
+      0; margin-top:0; line-height: 0px; font-weight: 600; } .totals-wrapper{ height: 100px; } .totals{ margin: 0; padding: 0; } .totals dt{ width: 40px; line-height: 22px; } .totals dd{ line-height: 22px; } .details { border: 1px solid #333; height:
+      100px; .left {text-align: left;} .right {text-align: right;} } .logo { display: block; font-size: 44px; margin:0px;padding: 0px; padding-top: 20px;padding-top: 0px; } .top {position:fixed,top: 10px,height: 10px} .bottom{position: fixed;top: 90%;
+      bottom:10px,height: 10px} .capitalize {text-transform: capitalize;} .clave{font-size: 10px}
+
+    </mj-style>
+  </mj-head>
+
+  <mj-body margin="0" width="970px" padding="0">
+
+
+
+    <mj-section padding="0">
+
+      <mj-column width="60%" padding="0">
+
+        <mj-text padding="0px" font-size="20px">
+          <ul>
+            <li class="capitalize">{{emisor.nombre}}</li>
+            <li>Cédula: {{emisor.cedula}}</li>
+            <li class="ul-small">Ubicación: {{emisor.ubicacion}}
+            </li>
+          </ul>
+        </mj-text>
+
+      </mj-column>
+
+      <mj-column width="40%" padding="0">
+        <mj-text font-size="20px">
+
+          <dl>
+            <dt>Documento: </dt>
+            <dd>Proforma - {{id}}</dd>
+          </dl>
+          <dl>
+            <dt>Orden: </dt>
+            <dd>{{name}}</dd>
+          </dl>
+        </mj-text>
+      </mj-column>
+
+    </mj-section>
+
+    <mj-section padding="0">
+
+
+      <mj-divider border-color="#333"></mj-divider>
+
+      <mj-column width="60%" padding="0">
+        <mj-text font-size="20px">
+          <dl>
+            <dt>Cliente: </dt>
+            <dd class="capitalize">{{clienteName}}</dd>
+          </dl>
+          <dl>
+            <dt>Cédula: </dt>
+            <dd>{{cedula}}</dd>
+          </dl>
+          <dl>
+            <dt>Transporte: </dt>
+            <dd class="capitalize">{{transporte}}</dd>
+          </dl>
+
+        </mj-text>
+      </mj-column>
+
+      <mj-column width="40%" padding="0">
+
+        <mj-text font-size="10px">
+          <dl>
+            <dt>Fecha: </dt>
+            <dd>{{fecha}}</dd>
+          </dl>
+          <dl>
+            <dt>Vence:</dt>
+            <dd>{{fechaVencimiento}}</dd>
+          </dl>
+
+        </mj-text>
+      </mj-column>
+
+      <mj-column width="100%" padding="0">
+
+        <mj-table>
+          <tr style="border-bottom:4px solid #ecedee; border-top:4px solid #ecedee;text-align:left;">
+            <th width="20%" style="padding:0">Cantidad</th>
+            <th width="20%" style="padding:0 ">Precio Unitario</th>
+            <th width="20%" style="padding:0 ">Descuento</th>
+            <th width="20%" style="padding:0 ">%</th>
+            <th width="20%" style="padding:0">Total</th>
+          </tr>
+        </mj-table>
+
+
+        {{#each lineas}}
+
+        <mj-text padding-bottom="4px" padding-top="10px">
+          <p class="producto-name capitalize">{{__productoId}}</p>
+        </mj-text>
+
+        <mj-table padding-top="0px">
+          <tr style="border-bottom:1px solid #ecedee;text-align:center;">
+            <td width="20%" style="padding: 0">{{cantidad}}</td>
+            <td width="20%" style="padding: 0">{{precio}}</td>
+            <td width="20%" style="padding: 0">{{descuento}}</td>
+            <td width="20%" style="padding: 0">{{descuentoUnitario}}</td>
+            <td width="20%" style="padding: 0">{{total}}</td>
+          </tr>
+        </mj-table>
+
+        {{/each}}
+
+      </mj-column>
+
+    </mj-section>
+
+    <mj-divider border-color="#333"></mj-divider>
+    <mj-section padding-top="0" padding-bottom="0">
+      <mj-column>
+        <mj-text padding="3px">Detalles: {{descripcion}}</mj-text>
+      </mj-column>
+    </mj-section>
+
+    <mj-section padding-top="0">
+      <mj-column>
+
+        <mj-table padding="3px" padding-top="10px" font-size="12px">
+          <tr>
+            <th style="padding:0">Moneda: {{moneda}}</th>
+            <th style="padding:0">Tipo Cambio: {{tipoCambio}}</th>
+            <th style="padding:0">SubTotal: {{subTotal}}</th>
+            <th style="padding:0">Descuentos: {{descuento}}</th>
+            <th style="padding:0">Impuesto: {{impuesto}}</th>
+            <th style="padding:0">Total: {{total}}</th>
+          </tr>
+        </mj-table>
+      </mj-column>
+
+    </mj-section>
+
+    <mj-section padding="0px" padding-top="10px" padding-bottom="10px">
+      <mj-column padding="0">
+        <mj-text padding="1px">Documento confidencial, no transferible</mj-text>
+      </mj-column>
+    </mj-section>
+
+
+
+  </mj-body>
+</mjml>

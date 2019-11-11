@@ -1,0 +1,286 @@
+{
+  "$id": "http://example.com/facturaCxp.json",
+  "title": "Factura de Cuenta por Pagar",
+  "limit": 1000,
+  "maxLimit": 5000,
+  "namespace": "cxp",
+  "key": "facturaCxP",
+  "type": "object",
+  "restricted": [
+    "referencia",
+    "fechaFactura",
+    "total",
+    "subTotal",
+    "impuesto",
+    "descuento",
+    "saldo",
+    "moneda",
+    "tipoCambio",
+    "proveedorId",
+    "__proveedorId"
+  ],
+  "properties": {
+    "id": {
+      "$id": "/properties/id",
+      "type": "integer",
+      "title": "Id"
+    },
+    "estado": {
+      "$id": "/properties/estado",
+      "type": "string",
+      "title": "Estado",
+      "element": "select",
+      "readOnly": true,
+      "filterable": true,
+      "filterRenderer": "SelectFilter",
+      "enum": ["por aceptar", "por aprobar", "por pagar", "archivado"],
+      "width": 110
+    },
+    "referencia": {
+      "$id": "/properties/referencia",
+      "type": "string",
+      "filterable": true,
+      "filterTerm": "LIKE",
+      "title": "Referencia",
+      "width": 100,
+      "locked": true
+    },
+    "tipo": {
+      "$id": "/properties/tipo",
+      "element": "select",
+      "default": "FA",
+      "enum": ["FA", "NC", "ND"],
+      "type": "string",
+      "title": "Tipo"
+    },
+    "descripcion": {
+      "$id": "/properties/descripcion",
+      "type": "string",
+      "title": "Descripcion",
+      "element": "text",
+      "width": 450
+    },
+    "plazoActual": {
+      "$id": "/properties/plazoActual",
+      "type": "integer",
+      "title": "Plazo Actual",
+      "default": 0,
+      "minimum": 0,
+      "filterRenderer": "NumericFilter",
+      "filterable": true,
+      "sortable": true
+    },
+    "fechaIngreso": {
+      "$id": "/properties/fechaIngreso",
+      "type": "string",
+      "title": "Ingresada",
+      "width": 120,
+      "filterable": true,
+      "filterRenderer": "DateFilter",
+      "default": "TODAY",
+      "element": "date",
+      "pattern": "[0-9]{4}-[0-9]{2}-[0-9]{2}"
+    },
+    "fechaFactura": {
+      "$id": "/properties/fechaFactura",
+      "type": "string",
+      "title": "Facturacion",
+      "width": 120,
+      "filterable": true,
+      "filterRenderer": "DateFilter",
+      "default": "TODAY",
+      "element": "date",
+      "pattern": "[0-9]{4}-[0-9]{2}-[0-9]{2}",
+      "lockOn": "pendiente"
+    },
+    "fechaProgramacion": {
+      "$id": "/properties/fechaProgramacion",
+      "type": "string",
+      "element": "date",
+      "filterable": true,
+      "filterRenderer": "DateFilter",
+      "editable": true,
+      "width": 150,
+      "editor": "date",
+      "title": "Pagar el",
+      "default": "TODAY",
+      "pattern": "[0-9]{4}-[0-9]{2}-[0-9]{2}"
+    },
+    "fechaVencimiento": {
+      "$id": "/properties/fechaVencimiento",
+      "type": "string",
+      "element": "date",
+      "width": 100,
+      "filterable": true,
+      "filterRenderer": "DateFilter",
+      "title": "Vence",
+      "default": "TODAY",
+      "pattern": "[0-9]{4}-[0-9]{2}-[0-9]{2}"
+    },
+    "moneda": {
+      "$id": "/properties/moneda",
+      "element": "select",
+      "default": "CRC",
+      "filterable": true,
+      "enum": ["CRC", "USD", "EUR"],
+      "type": "string",
+      "title": "Moneda"
+    },
+    "tipoCambio": {
+      "$id": "/properties/tipoCambio",
+      "type": "number",
+      "default": 1,
+      "title": "Tipo de cambio",
+      "lockOn": "pendiente",
+      "width": 150
+    },
+    "subTotal": {
+      "$id": "/properties/subTotal",
+      "type": "number",
+      "default": 0,
+      "title": "SubTotal",
+      "lockOn": "pendiente",
+      "width": 150
+    },
+    "impuesto": {
+      "$id": "/properties/impuesto",
+      "type": "number",
+      "default": 0,
+      "title": "Impuesto",
+      "lockOn": "pendiente"
+    },
+    "descuento": {
+      "$id": "/properties/descuento",
+      "type": "number",
+      "default": 0,
+      "title": "Descuento",
+      "lockOn": "pendiente",
+      "width": 150
+    },
+    "total": {
+      "$id": "/properties/total",
+      "type": "number",
+      "default": 0,
+      "title": "Total",
+      "lockOn": "pendiente",
+      "width": 150,
+      "filterRenderer": "NumericFilter",
+      "filterable": true,
+      "sortable": true
+    },
+    "saldo": {
+      "$id": "/properties/saldo",
+      "type": "number",
+      "default": 0,
+      "title": "Saldo",
+      "filterable": true,
+      "filterRenderer": "NumericFilter",
+      "width": 150,
+      "sortable": true
+    },
+    "proveedorId": {
+      "$id": "/properties/proveedorId",
+      "type": "integer",
+      "title": "Proveedor",
+      "table": "proveedor",
+      "metadataType": "proveedor",
+      "route": "proveedor/findLikeName",
+      "element": "autocomplete",
+      "filterable": true,
+      "elementOptions": {
+        "primary": "name"
+      },
+      "lockOn": "*",
+      "width": 200,
+      "locked": true
+    },
+    "createdBy": {
+      "$id": "/properties/createdBy",
+      "type": "string",
+      "title": "Creado por"
+    },
+    "updatedBy": {
+      "$id": "/properties/updatedBy",
+      "type": "string",
+      "title": "Actualizado por"
+    },
+    "createdAt": {
+      "$id": "/properties/createdAt",
+      "type": "string",
+      "title": "Creado"
+    },
+    "updatedAt": {
+      "$id": "/properties/updatedAt",
+      "type": "string",
+      "title": "Actualizado"
+    }
+  },
+  "belongsTo": ["proveedor"],
+  "required": ["referencia", "fechaFactura", "total"],
+  "actions": ["Crear", "Editar", "Aprobar", "Borrar"],
+  "view": {
+    "fields": [
+      "proveedorId",
+      "referencia",
+      "estado",
+      "fechaProgramacion",
+      "fechaFactura",
+      "fechaVencimiento",
+      "saldo",
+      "total",
+      "descripcion",
+      "fechaIngreso"
+    ],
+    "widgets": [],
+    "relatedFields": [
+      {
+        "route": "lineaPagoCxP/query",
+        "key": "lineaPagoCxP",
+        "title": "Pagos",
+        "table": "lineaPagoCxP",
+        "fields": ["referencia", "moneda", "monto", "fecha"],
+        "filters": [["facturaCxP.id", "=", "$"]]
+      }
+    ]
+  },
+  "layout": [
+    {
+      "title": "Legal",
+      "cols": 4,
+      "fields": ["proveedorId", "referencia", "tipo"]
+    },
+    {
+      "title": "Valores",
+      "cols": 4,
+      "fields": ["subTotal", "descuento", "impuesto", "total", "moneda", "tipoCambio"]
+    },
+    {
+      "title": "Fechas",
+      "cols": 4,
+      "fields": ["fechaFactura", "fechaProgramacion", "fechaVencimiento"]
+    },
+    {
+      "title": "Descripcion",
+      "cols": 12,
+      "fieldSize": 12,
+
+      "fields": ["descripcion"]
+    }
+  ],
+  "table": {
+    "sum": ["saldo", "total"],
+    "fields": [
+      "id",
+      "proveedorId",
+      "referencia",
+      "estado",
+      "fechaProgramacion",
+      "fechaFactura",
+      "fechaVencimiento",
+      "saldo",
+      "total",
+      "descripcion",
+      "fechaIngreso"
+    ]
+  }
+}

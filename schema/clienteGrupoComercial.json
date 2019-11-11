@@ -1,0 +1,51 @@
+{
+  "$id": "http://example.com/example.json",
+  "type": "object",
+  "limit": 100,
+  "maxLimit": 500,
+  "key": "clienteGrupoComercial",
+  "title": "Grupo Comercial",
+  "namespace": "venta",
+
+  "restricted": [],
+  "properties": {
+    "id": {
+      "$id": "/properties/id",
+      "type": "integer",
+      "title": "Id"
+    },
+
+    "name": {
+      "$id": "/properties/name",
+      "type": "string",
+      "title": "Nombre",
+      "filterable": true,
+      "sortabe": true,
+      "width": 400
+    },
+
+    "descripcion": {
+      "$id": "/properties/descripcion",
+      "type": "string",
+      "title": "Descripcion",
+      "filterable": true,
+      "sortabe": true,
+      "width": 1000
+    }
+  },
+  "belongsTo": [],
+  "required": ["name", "descripcion"],
+  "layout": [
+    {
+      "title": "Información",
+      "fieldSize": 12,
+      "fields": ["name", "descripcion"]
+    }
+  ],
+  "actions": ["Crear", "Editar", "Borrar"],
+  "table": {
+    "sum": [],
+    "fields": ["id", "name", "descripcion"]
+  },
+  "batch": []
+}

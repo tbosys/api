@@ -1,0 +1,169 @@
+{
+  "$id": "http://example.com/example.json",
+  "type": "object",
+  "limit": 100,
+  "maxLimit": 500,
+  "key": "project",
+  "title": "Proyecto",
+  "namespace": "organizacion",
+  "restricted": [],
+  "properties": {
+    "id": {
+      "$id": "/properties/id",
+      "type": "integer",
+      "title": "Id"
+    },
+
+    "name": {
+      "$id": "/properties/name",
+      "type": "string",
+      "title": "Titulo",
+      "filterable": true,
+      "sortabe": true,
+      "width": 380
+    },
+
+    "descripcion": {
+      "$id": "/properties/descripcion",
+      "type": "string",
+      "title": "Descripcion",
+      "editable": true,
+      "element": "textarea",
+      "width": 1700
+    },
+
+    "estado": {
+      "$id": "/properties/estado",
+      "type": "string",
+      "title": "estado",
+      "width": 120,
+      "element": "select",
+      "editable": true,
+      "filterable": true,
+      "sortable": true,
+      "default": "por planear",
+      "enum": ["por planear", "por esperar", "trabajando", "archivado"],
+      "filterRenderer": "SelectFilter"
+    },
+
+    "departamento": {
+      "$id": "/properties/departamento",
+      "type": "string",
+      "title": "Departamento",
+      "width": 120,
+      "element": "select",
+      "editable": true,
+      "filterable": true,
+      "sortable": true,
+      "default": "ventas",
+      "enum": [
+        "ventas",
+        "credito",
+        "mercadeo",
+        "operaciones",
+        "logistica y bodega",
+        "importacion",
+        "contabilidad",
+        "tesoreria"
+      ],
+      "filterRenderer": "SelectFilter"
+    },
+
+    "fechaFin": {
+      "$id": "/properties/fechaFin",
+      "type": "string",
+      "title": "Completar",
+      "width": 100,
+      "filterable": true,
+      "sortable": true,
+      "filterRenderer": "DateFilter",
+      "formatter": "DateTimeFormatter",
+      "element": "date"
+    },
+
+    "prioridad": {
+      "$id": "/properties/descripcion",
+      "type": "string",
+      "title": "Prioridad",
+      "editable": true,
+      "filterable": true,
+      "sortable": true,
+      "width": 100,
+      "element": "select",
+      "filterRenderer": "SelectFilter",
+
+      "enum": ["alta", "baja", "media"]
+    },
+
+    "avance": {
+      "$id": "/properties/precios",
+      "type": "number",
+      "title": "Progreso",
+      "editable": true,
+      "filterable": true,
+      "sortable": true,
+      "width": 100,
+      "filterRenderer": "NumberFilter",
+      "formatter": "PercentFormatter"
+    },
+    "ownerId": {
+      "$id": "/properties/ownerId",
+      "type": "integer",
+      "title": "Propietario",
+      "table": "owner",
+      "filterable": true,
+      "sortable": true,
+      "route": "owner/findLikeName",
+      "metadataType": "owner",
+      "element": "autocomplete",
+      "elementOptions": {
+        "primary": "name"
+      },
+      "width": 200
+    },
+    "tareas": {
+      "title": "Tareas",
+      "element": "task",
+      "excludeFromQuery": true,
+      "type": "string"
+    }
+  },
+  "belongsTo": ["owner"],
+  "required": [],
+  "layout": [
+    {
+      "title": "Información",
+      "columns": 8,
+      "fieldSize": 12,
+      "fields": ["name", "descripcion"]
+    },
+    {
+      "title": "Información",
+      "columns": 4,
+      "fieldSize": 12,
+      "fields": ["departamento", "fechaFin", "prioridad", "avance", "estado"]
+    },
+    {
+      "title": "Tareas",
+      "columns": 12,
+      "fieldSize": 12,
+      "fields": ["tareas"]
+    }
+  ],
+  "actions": ["Crear", "Editar", "Borrar"],
+  "table": {
+    "sum": [],
+    "fields": [
+      "id",
+      "name",
+      "departamento",
+      "ownerId",
+      "estado",
+      "fechaFin",
+      "prioridad",
+      "avance",
+      "descripcion"
+    ]
+  },
+  "batch": []
+}

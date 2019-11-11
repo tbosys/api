@@ -1,0 +1,161 @@
+{
+  "$id": "http://example.com/example.json",
+  "type": "object",
+  "key": "task",
+  "title": "tarea",
+  "limit": 140,
+  "maxLimit": 10000,
+  "namespace": "organizacion",
+  "restricted": [],
+  "secure": false,
+  "properties": {
+    "id": {
+      "$id": "/properties/id",
+      "type": "integer",
+      "title": "Id"
+    },
+    "name": {
+      "$id": "/properties/name",
+      "type": "string",
+      "title": "Nombre",
+      "width": 450,
+      "filterable": true,
+      "editable": true
+    },
+
+    "fechaVencimiento": {
+      "$id": "/properties/fechaVencimiento",
+      "type": "string",
+      "title": "fechaVencimiento",
+      "width": 150,
+      "element": "date",
+      "filterRenderer": "DateFilter",
+      "filterable": true,
+      "editable": true
+    },
+
+    "createdById": {
+      "$id": "/properties/createdById",
+      "type": "integer",
+      "title": "createdById",
+
+      "filterable": true,
+      "editable": true
+    },
+    "createdBy": {
+      "$id": "/properties/createdById",
+      "type": "string",
+      "title": "Creado Por",
+      "width": 150,
+      "filterable": true,
+
+      "sortable": true
+    },
+
+    "description": {
+      "$id": "/properties/description",
+      "type": "string",
+      "title": "description",
+      "width": 1450,
+      "filterable": true,
+      "editable": true
+    },
+    "comentarios": {
+      "$id": "/properties/comentarios",
+      "type": "string",
+      "title": "comentarios",
+      "width": 1450,
+      "filterable": true,
+      "editable": true
+    },
+
+    "attachment": {
+      "$id": "/properties/",
+      "type": "string",
+      "title": "",
+      "filterable": true,
+      "editable": true
+    },
+
+    "type": {
+      "$id": "/properties/",
+      "type": "string",
+      "title": "",
+      "filterable": true,
+      "editable": true
+    },
+
+    "accountTypeId": {
+      "$id": "/properties/accountTypeId",
+      "type": "string",
+      "title": "accountTypeId",
+      "filterable": true,
+      "editable": true
+    },
+
+    "order": {
+      "$id": "/properties/order",
+      "type": "integer",
+      "title": "order",
+      "filterable": true,
+      "editable": true
+    },
+
+    "estado": {
+      "$id": "/properties/",
+      "type": "string",
+      "title": "estado",
+      "filterable": true,
+      "editable": true,
+      "enum": ["pendiente", "por empezar", "trabajando", "archivado"]
+    },
+
+    "isSection": {
+      "$id": "/properties/",
+      "type": "boolean",
+      "title": "Seccion",
+      "filterable": true,
+      "editable": true
+    },
+
+    "ownerId": {
+      "$id": "/properties/ownerId",
+      "type": "integer",
+      "title": "Propietario",
+      "table": "owner",
+      "filterable": true,
+      "sortable": true,
+      "route": "owner/findLikeName",
+      "metadataType": "owner",
+      "element": "autocomplete",
+      "elementOptions": {
+        "primary": "name"
+      },
+      "width": 200
+    }
+  },
+  "required": ["name"],
+  "layout": [
+    {
+      "title": "Información",
+      "cols": 6,
+      "fields": ["name", "description", "ownerId"]
+    }
+  ],
+  "belongsTo": ["owner"],
+  "actions": ["Crear", "Editar", "Borrar"],
+  "table": {
+    "sum": [],
+    "fields": [
+      "id",
+      "ownerId",
+      "createdBy",
+      "name",
+      "estado",
+      "fechaVencimiento",
+      "description",
+
+      "comentarios"
+    ]
+  }
+}

@@ -1,0 +1,111 @@
+{
+  "$id": "http://example.com/example.json",
+  "type": "object",
+  "limit": 1000,
+  "maxLimit": 5000,
+  "restricted": [],
+  "title": "Reporte",
+  "key": "reporte",
+  "namespace": "auditoria",
+  "secure": false,
+  "properties": {
+    "id": {
+      "$id": "/properties/id",
+      "type": "integer",
+      "title": "Id"
+    },
+    "name": {
+      "$id": "/properties/fields",
+      "type": "string",
+      "title": "Nombre",
+      "width": 450
+    },
+
+    "sums": {
+      "$id": "/properties/fields",
+      "type": "string",
+      "element": "multiselectDynamic",
+      "route": "reporte/queryProperties",
+      "queryOnChange": ["table"],
+      "isJSON": true,
+      "title": "sumas"
+    },
+    "sort": {
+      "$id": "/properties/sort",
+      "type": "string",
+      "element": "multiselectDynamic",
+      "route": "reporte/queryProperties",
+      "queryOnChange": ["table"],
+      "isJSON": true,
+      "title": "orden"
+    },
+    "fields": {
+      "$id": "/properties/fields",
+      "type": "string",
+      "element": "multiselectDynamic",
+      "route": "reporte/queryProperties",
+      "queryOnChange": ["table"],
+      "isJSON": true,
+      "title": "Campos"
+    },
+    "table": {
+      "$id": "/properties/table",
+      "type": "string",
+      "element": "selectDynamic",
+      "route": "reporte/queryTables",
+      "title": "Tipo"
+    },
+    "filters": {
+      "$id": "/properties/filters",
+      "type": "string",
+      "isJSON": true,
+      "title": "Filtros"
+    },
+    "groups": {
+      "$id": "/properties/groups",
+      "type": "string",
+      "element": "multiselectDynamic",
+      "route": "reporte/queryProperties",
+      "queryOnChange": ["table"],
+      "isJSON": true,
+      "title": "Agrupar"
+    },
+    "createdBy": {
+      "$id": "/properties/createdBy",
+      "type": "string",
+      "title": "Creado por",
+      "filterable": true,
+      "sortable": true
+    },
+    "createdAt": {
+      "$id": "/properties/createdAt",
+      "type": "string",
+      "title": "Creado",
+      "filterable": true,
+      "sortable": true,
+      "formatter": "DateTimeFormatter"
+    }
+  },
+  "actions": ["Crear", "Editar"],
+  "belongsTo": [],
+  "required": [],
+  "table": { "sum": [], "fields": ["name", "table", "fields", "sums", "groups", "filters"] },
+  "layout": [
+    {
+      "title": "Detalles",
+      "fields": ["name", "table"]
+    },
+    {
+      "title": "Columnas",
+      "fields": ["fields"]
+    },
+    {
+      "title": "Columnas",
+      "fields": ["sums", "groups"]
+    },
+    {
+      "title": "Filtros",
+      "fields": ["filters"]
+    }
+  ]
+}

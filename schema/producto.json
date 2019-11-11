@@ -1,0 +1,496 @@
+{
+    "$id": "http://example.com/example.json",
+    "type": "object",
+    "key": "producto",
+    "title": "Productos",
+    "limit": 100,
+    "maxLimit": 10000,
+    "orderBy": ["name", "ASC"],
+    "secure": false,
+    "namespace": "inventario",
+    "restricted": [
+        "inventario",
+        "porcentajeComision"
+    ],
+    "properties": {
+        "id": {
+            "$id": "/properties/id",
+            "type": "integer",
+            "title": "Id",
+            "default": 0,
+            "locked": true
+        },
+        "name": {
+            "$id": "/properties/name",
+            "type": "string",
+            "title": "Nombre",
+            "width": 350,
+            "filterable": true,
+            "sortable": true,
+            "formatter": "TextFormatter",
+            "locked": true
+        },
+        "promedioVentas": {
+            "$id": "/properties/promedioVentas",
+            "type": "string",
+            "title": "Promedio",
+            "readOnly": true,
+            "filterable": true,
+            "sortable": true
+        },
+        "porcentajeComision": {
+            "$id": "/properties/porcentajeComision",
+            "type": "number",
+            "title": "Porcentaje Comisioón",
+            "filterable": true,
+            "sortable": true
+        },
+        "activo": {
+            "$id": "/properties/activo",
+            "type": "boolean",
+            "title": "Activo",
+            "default": true,
+            "filterable": true,
+            "filterRenderer": "BooleanFilter",
+            "formatter": "BooleanFormatter"
+        },
+        "primario": {
+            "$id": "/properties/primario",
+            "type": "boolean",
+            "title": "Primario",
+            "default": false,
+            "filterable": true,
+            "formatter": "BooleanFormatter"
+        },
+        "mercancia": {
+            "$id": "/properties/mercancia",
+            "type": "boolean",
+            "title": "Mercancia",
+            "default": true,
+            "formatter": "BooleanFormatter",
+            "filterable": true
+        },
+        "descripcion": {
+            "$id": "/properties/descripcion",
+            "type": "string",
+            "element": "textArea",
+            "title": "Descripcion"
+        },
+        "unidadMedida": {
+            "$id": "/properties/unidadMedida",
+            "type": "string",
+            "title": "Unidad de Medida",
+            "default": "Unid",
+            "element": "select",
+            "filterRenderer": "SelectFilter",
+            "enum": [
+                "Al",
+                "Alc",
+                "Cm",
+                "I",
+                "Os",
+                "Spe",
+                "Sp",
+                "St",
+                "m",
+                "kg",
+                "s",
+                "A",
+                "K",
+                "mol",
+                "cd",
+                "m²",
+                "m³",
+                "m/s",
+                "m/s²",
+                "1/m",
+                "kg/m³",
+                "A/m²",
+                "A/m",
+                "mol/m³",
+                "cd/m²",
+                "1",
+                "rad",
+                "sr",
+                "Hz",
+                "N",
+                "Pa",
+                "J",
+                "W",
+                "C",
+                "V",
+                "F",
+                "Ω",
+                "S",
+                "Wb",
+                "T",
+                "H",
+                "°C",
+                "lm",
+                "lx",
+                "Bq",
+                "Gy",
+                "Sv",
+                "kat",
+                "Pa·s",
+                "N·m",
+                "N/m",
+                "rad/s",
+                "rad/s²",
+                "W/m²",
+                "J/K",
+                "J/(kg·K)",
+                "J/kg",
+                "W/(m·K)",
+                "J/m³",
+                "V/m",
+                "C/m³",
+                "C/m²",
+                "F/m",
+                "H/m",
+                "J/mol",
+                "J/(mol·K)",
+                "C/kg",
+                "Gy/s",
+                "W/sr",
+                "W/(m²·sr)",
+                "kat/m³",
+                "min",
+                "h",
+                "d",
+                "º",
+                "´",
+                "´´",
+                "L",
+                "t",
+                "Np",
+                "B",
+                "eV",
+                "u",
+                "ua",
+                "Unid",
+                "Gal",
+                "g",
+                "Km",
+                "Kw",
+                "ln",
+                "cm",
+                "mL",
+                "mm",
+                "Oz",
+                "Ω",
+                "Otros"
+            ]
+        },
+        "familia": {
+            "$id": "/properties/familia",
+            "type": "string",
+            "title": "Familia",
+            "filterable": true,
+            "editable": true,
+            "sortable": true
+        },
+        "subFamilia": {
+            "$id": "/properties/subFamilia",
+            "type": "string",
+            "title": "Sub Familia",
+            "filterable": true,
+            "editable": true,
+            "sortable": true
+        },
+        "codigo": {
+            "$id": "/properties/codigo",
+            "type": "string",
+            "title": "Codigo",
+            "filterable": true
+        },
+        "marca": {
+            "$id": "/properties/marca",
+            "type": "string",
+            "title": "Marca",
+            "filterable": true,
+            "editable": true
+        },
+        "impuesto": {
+            "$id": "/properties/impuesto",
+            "type": "number",
+            "title": "Impuesto",
+            "default": 13
+        },
+        "impuestoCodigoTarifa": {
+            "$id": "/properties/impuestoCodigoTarifa",
+            "type": "string",
+            "title": "Codigo Tarifa",
+            "default": "08",
+            "enum": [
+                "01",
+                "02",
+                "03",
+                "04",
+                "05",
+                "06",
+                "07",
+                "08"
+            ]
+        },
+        "precio": {
+            "$id": "/properties/precio",
+            "type": "number",
+            "title": "precio"
+        },
+        "grupo": {
+            "$id": "/properties/grupo",
+            "type": "string",
+            "title": "Grupo Volumen",
+            "filterable": true,
+            "editable": true,
+            "sortable": true
+        },
+        "presentacion": {
+            "$id": "/properties/presentacion",
+            "type": "string",
+            "title": "Presentacion"
+        },
+        "categoriaName": {
+            "$id": "/properties/categoriaName",
+            "type": "string",
+            "title": "categoria",
+            "filterable": true,
+            "editable": true
+        },
+        "atributoCategoria": {
+            "$id": "/properties/atributoCategoria",
+            "type": "string",
+            "title": "Categoria",
+            "filterable": true,
+            "width": 150
+        },
+        "atributoSubCategoria": {
+            "$id": "/properties/atributoSubCategoria",
+            "type": "string",
+            "title": "SubCategoria",
+            "filterable": true
+        },
+        "atributoGeneral": {
+            "$id": "/properties/atributoGeneral",
+            "type": "string",
+            "title": "Grupo",
+            "filterable": true
+        },
+        "atributoPrincipal": {
+            "$id": "/properties/atributoPrincipal",
+            "type": "string",
+            "title": "Nombre",
+            "filterable": true,
+            "editable": true
+        },
+        "categoria": {
+            "$id": "/properties/categoria",
+            "type": "string",
+            "title": "Categoria Compra",
+            "filterable": true,
+            "width": 150
+        },
+        "categoriaId": {
+            "$id": "/properties/categoriaId",
+            "type": "integer",
+            "title": "Categoria"
+        },
+        "ownerId": {
+            "$id": "/properties/ownerId",
+            "type": "integer",
+            "title": "Propietario"
+        },
+        "ownerName": {
+            "$id": "/properties/ownerName",
+            "type": "string",
+            "title": "Nombre Propietario"
+        },
+        "createdBy": {
+            "$id": "/properties/createdBy",
+            "type": "string",
+            "title": "Creado por"
+        },
+        "updatedBy": {
+            "$id": "/properties/updatedBy",
+            "type": "string",
+            "title": "Actualizado por"
+        },
+        "createdAt": {
+            "$id": "/properties/createdAt",
+            "type": "string",
+            "title": "Creado"
+        },
+        "updatedAt": {
+            "$id": "/properties/updatedAt",
+            "type": "string",
+            "title": "Actualizado"
+        },
+        "inventario": {
+            "$id": "/properties/inventario",
+            "type": "number",
+            "title": "inventario"
+        },
+        "grupoProductoId": {
+            "$id": "/properties/grupoProductoId",
+            "type": "integer",
+            "title": "Grupo Producto",
+            "table": "grupoProducto",
+            "metadataType": "grupoProducto",
+            "filterable": true,
+            "route": "grupoProducto/findLikeName",
+            "element": "autocomplete",
+            "width": 100,
+            "default": 3,
+            "elementOptions": {
+                "primary": "name"
+            }
+        }
+    },
+    "required": [
+        "name",
+        "codigo",
+        "unidadMedida"
+    ],
+    "belongsTo": [
+        "grupoProducto"
+    ],
+    "actions": [
+        "Crear",
+        "Editar",
+        "Ver",
+        {
+            "title": "Boletas",
+            "type": "modal"
+        }
+    ],
+    "view": {
+        "fields": [
+            "id",
+            "name",
+            "codigo",
+            "inventario",
+            "promedioVentas",
+            "familia",
+            "subFamilia",
+            "grupoProductoId",
+            "unidadMedida",
+            "mercancia",
+            "activo"
+        ],
+        "fullFields": [],
+        "metrics": [
+            {
+                "key": "venta",
+                "title": "Ventas (₡)",
+                "type": "BAR",
+                "table": "movimientoInventario",
+                "filters": [
+                    [
+                        "movimientoInventario.productoId",
+                        "=",
+                        "$"
+                    ],
+                    [
+                        "documento.fecha",
+                        "FIXED",
+                        "6 MESES"
+                    ]
+                ],
+                "groupBy": {
+                    "sumFields": "subTotalConDescuento",
+                    "groupBy": [
+                        "movimientoInventario.productoId"
+                    ],
+                    "dateGroup": "fecha-mes"
+                }
+            },
+            {
+                "key": "venta",
+                "title": "Ventas (#)",
+                "type": "BAR",
+                "table": "movimientoInventario",
+                "filters": [
+                    [
+                        "movimientoInventario.productoId",
+                        "=",
+                        "$"
+                    ],
+                    [
+                        "documento.fecha",
+                        "FIXED",
+                        "6 MESES"
+                    ]
+                ],
+                "groupBy": {
+                    "sumFields": "cantidad",
+                    "groupBy": [
+                        "movimientoInventario.productoId"
+                    ],
+                    "dateGroup": "fecha-mes"
+                }
+            }
+        ],
+        "relatedFields": []
+    },
+    "layout": [
+        {
+            "title": "Información",
+            "fields": [
+                "name",
+                "codigo",
+                "mercancia",
+                "unidadMedida",
+                "descripcion",
+                "activo"
+            ]
+        },
+        {
+            "title": "Categoria",
+            "fields": [
+                "categoriaName",
+                "grupoProductoId",
+                "familia",
+                "subFamilia",
+                "marca",
+                "impuesto",
+                "impuestoCodigoTarifa",
+                "grupo"
+            ]
+        }
+    ],
+    "table": {
+        "sum": [],
+        "fields": [
+            "id",
+            "name",
+            "codigo",
+            "inventario",
+            "promedioVentas",
+            "grupoProductoId",
+            "marca",
+            "familia",
+            "subFamilia",
+            "categoriaName",
+            "grupo",
+            "presentacion",
+            "unidadMedida",
+            "mercancia",
+            "activo"
+        ]
+    },
+    "batch": [
+        "familia",
+        "subFamilia",
+        "categoriaName",
+        "atributoCategoria",
+        "atributoSubCategoria",
+        "atributoGeneral",
+        "atributoPrincipal",
+        "presentacion",
+        "unidadMedida",
+        "mercancia",
+        "activo",
+        "porcentajeComision"
+    ]
+}

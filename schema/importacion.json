@@ -1,0 +1,229 @@
+{
+  "$id": "http://example.com/example.json",
+  "type": "object",
+  "title": "Importaciones",
+  "limit": 1000,
+  "maxLimit": 5000,
+  "shareLevel": 1,
+  "key": "importacion",
+  "namespace": "inventario",
+  "properties": {
+    "id": {
+      "$id": "/properties/id",
+      "type": "integer",
+      "title": "Id",
+      "locked": true,
+      "sortable": true
+    },
+    "estado": {
+      "$id": "/properties/estado",
+      "type": "string",
+      "title": "Estado",
+      "filterable": true,
+      "filterRenderer": "SelectFilter",
+      "element": "select",
+      "enum": ["por arribar", "archivado"]
+    },
+    "tipo": {
+      "$id": "/properties/tipo",
+      "type": "string",
+      "title": "Tipo",
+      "filterable": true,
+      "filterRenderer": "SelectFilter",
+      "element": "select",
+      "default": "pedido",
+      "enum": ["pedido", "proforma"]
+    },
+
+    "name": {
+      "$id": "/properties/name",
+      "type": "string",
+      "title": "Nombre",
+      "filterable": true,
+      "locked": true
+    },
+    "codigo": {
+      "$id": "/properties/name",
+      "type": "string",
+      "title": "Codigo",
+      "filterable": true
+    },
+
+    "descripcion": {
+      "$id": "/properties/descripcion",
+      "type": "string",
+      "title": "Descripcion",
+      "formatter": "TextFormatter"
+    },
+
+    "total": {
+      "$id": "/properties/total",
+      "type": "number",
+      "title": "Total",
+      "readOnly": true
+    },
+    "approvedBy": {
+      "$id": "/properties/approveBy",
+      "type": "string",
+      "title": "Aprobado por"
+    },
+
+    "fechaArribo": {
+      "$id": "/properties/fechaArribo",
+      "type": "string",
+      "element": "date",
+      "title": "Fecha",
+      "filterable": true,
+      "sortable": true,
+      "filterRenderer": "DateFilter"
+    },
+    "fechaPedido": {
+      "$id": "/properties/fechaPedido",
+      "type": "string",
+      "element": "date",
+
+      "title": "Fecha Entrega",
+      "filterable": true,
+      "sortable": true,
+      "width": 200,
+
+      "filterRenderer": "DateFilter"
+    },
+
+    "ownerId": {
+      "$id": "/properties/ownerId",
+      "type": "integer",
+      "title": "Propietario"
+    },
+
+    "createdBy": {
+      "$id": "/properties/createdBy",
+      "type": "string",
+      "title": "Creado por",
+      "sortable": true
+    },
+    "moneda": {
+      "$id": "/properties/moneda",
+      "type": "string",
+      "title": "moneda",
+      "enum": ["CRC", "USD"],
+      "element": "select",
+      "filterRenderer": "SelectFilter",
+      "filterable": true,
+      "default": "CRC"
+    },
+    "pdfBL": {
+      "$id": "/properties/pdfBL",
+      "type": "string",
+      "title": "PDF",
+      "formatter": "LinkFormatter"
+    },
+    "pdfFactura": {
+      "$id": "/properties/pdfFactura",
+      "type": "string",
+      "title": "PDF",
+      "formatter": "LinkFormatter"
+    },
+    "tipoCambio": {
+      "$id": "/properties/tipoCambio",
+      "type": "number",
+      "title": "tipoCambio",
+      "default": 1
+    },
+    "updatedBy": {
+      "$id": "/properties/updatedBy",
+      "type": "string",
+      "title": "Actualizado por"
+    },
+    "createdAt": {
+      "$id": "/properties/createdAt",
+      "type": "string",
+      "title": "Creado"
+    },
+    "updatedAt": {
+      "$id": "/properties/updatedAt",
+      "type": "string",
+      "title": "Actualizado"
+    },
+    "importacionLinea": {
+      "isJSON": true,
+      "width": 100,
+      "title": "Productos",
+      "formatter": "ChildFormatter",
+      "fields": ["__productoId", "cantidad", "precio", "descuentoUnitario", "impuestoUnitario"],
+      "editables": ["cantidad", "precio", "descuentoUnitario", "impuestoUnitario"],
+      "idField": "productoId",
+      "element": "table",
+      "type": "string",
+      "items": {
+        "type": "object"
+      }
+    },
+    "proveedorId": {
+      "$id": "/properties/proveedorId",
+      "type": "integer",
+      "title": "Proveedor",
+      "table": "proveedor",
+      "metadataType": "proveedor",
+      "filterable": true,
+      "sortable": true,
+      "route": "proveedor/findLikeName",
+      "element": "autocomplete",
+      "width": 120,
+      "elementOptions": {
+        "primary": "name"
+      }
+    }
+  },
+  "belongsTo": ["proveedor"],
+  "aprobarActions": ["por aprobar"],
+  "actions": ["Crear", "Editar", "Borrar"],
+  "layout": [
+    {
+      "title": "Orden",
+      "cols": 12,
+      "fieldSize": 3,
+      "fields": ["proveedorId", "name", "codigo"]
+    },
+    {
+      "title": "Detalles",
+      "cols": 12,
+      "fieldSize": 12,
+      "fields": ["descripcion"]
+    },
+    {
+      "title": "Opciones",
+      "cols": 6,
+      "fields": ["fechaArribo", "fechaPedido", "total"]
+    },
+    {
+      "title": "Opciones",
+      "cols": 6,
+      "fields": ["tipo", "pdfFactura", "pdfBL"]
+    }
+  ],
+  "batch": ["estado", "transporteId", "fechaEntrega"],
+  "table": {
+    "sum": ["total"],
+    "fields": [
+      "id",
+      "name",
+      "proveedorId",
+      "codigo",
+      "fechaArribo",
+      "fechaPedido",
+      "total",
+
+      "estado",
+      "tipo",
+      "pdfFactura",
+      "pdfBL",
+
+      "tipo",
+
+      "createdBy",
+      "createdAt",
+      "updatedAt"
+    ]
+  }
+}

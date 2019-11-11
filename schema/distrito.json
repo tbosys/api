@@ -1,0 +1,50 @@
+{
+  "$id": "http://example.com/example.json",
+  "type": "object",
+  "key": "distrito",
+  "restricted": [],
+  "namespace": "venta",
+  "title": "Distritos",
+  "properties": {
+    "id": {
+      "$id": "/properties/id",
+      "type": "integer",
+      "title": "Id"
+    },
+    "name": {
+      "$id": "/properties/name",
+      "type": "string",
+      "title": "Nombre"
+    },
+
+    "cantonId": {
+      "$id": "/properties/cantonId",
+      "type": "integer",
+      "title": "Canton",
+      "table": "canton",
+      "metadataType": "canton",
+      "filterable": true,
+      "route": "canton/findLikeName",
+      "element": "autocomplete",
+      "width": 100,
+      "elementOptions": {
+        "primary": "name"
+      }
+    },
+
+    "distritoCode": {
+      "$id": "/properties/distritoCode",
+      "type": "integer",
+      "title": "Codigo Canton"
+    }
+  },
+  "actions": ["Crear", "Editar"],
+  "required": ["name", "cantonId", "distritoCode"],
+  "table": { "fields": ["name", "cantonId", "distritoCode"] },
+  "layout": [
+    {
+      "title": "Información",
+      "fields": ["name", "cantonId", "distritoCode"]
+    }
+  ]
+}

@@ -1,0 +1,158 @@
+<mjml>
+
+  <mj-head>
+    <!--FONTS-->
+    <mj-attributes>
+      <!-- This sets the global font of the template to FSBlakeLight and adds fallbacks. -->
+      <mj-all font-family="'ProximaNova', 'Helvetica', Arial, sans-serif;" />
+    </mj-attributes>
+    <!--INLINE CSS-->
+    <mj-style inline="inline">
+      body{background-color: #fff} .body{ backgroud-color: #fff; padding: 0, margin: 0, max-width: 1000px } ul { font-size:11px; list-style: none; padding: 0; margin: 0; } li{ margin-bottom: 5px; } li:first-child{ font-size: 15px; } dl{ font-size: 13px; margin:0;
+      padding: 0; } dt,dd{ list-style: none; display: inline-block; padding: 0; margin: 0; font-size: 13px; } dt{ width: 80px; line-height: 22px; } .small{ font-size: 11px; } .producto-name{ font-size: 13px; padding-left: 0; padding-bottom: 0; margin-bottom:
+      0; margin-top:0; line-height: 0px; font-weight: 600; } .totals-wrapper{ height: 100px; } .totals{ margin: 0; padding: 0; } .totals dt{ width: 40px; line-height: 22px; } .totals dd{ line-height: 22px; } .details { border: 1px solid #333; height:
+      100px; .left {text-align: left;} .right {text-align: right;} } .logo { display: block; font-size: 44px; margin:0px;padding: 0px; padding-top: 20px;padding-top: 0px; } .top {position:fixed,top: 10px,height: 10px} .bottom{position: fixed;top: 90%;
+      bottom:10px,height: 10px} .capitalize {text-transform: capitalize;}
+    </mj-style>
+  </mj-head>
+
+  <mj-body margin="0" max-width="1000" padding="0">
+
+    <mj-section padding="0px" padding-top="10px" padding-bottom="10px">
+      <mj-column padding="0">
+        <mj-text padding="1px">{{clave}}</mj-text>
+      </mj-column>
+    </mj-section>
+
+    <mj-section padding="0">
+
+      <mj-column width="25%" padding="0">
+        <mj-image padding="0px" width="200px" src="http://facturas.efactura.io/logos/rodco.png" />
+
+        <mj-text padding="0px" font-size="20px">
+          <ul>
+            <li class="capitalize">{{emisor.nombre}}</li>
+            <li>{{emisor.cedula}}</li>
+          </ul>
+        </mj-text>
+
+      </mj-column>
+      <mj-column width="20%" padding="0">
+      </mj-column>
+
+
+      <mj-column width="55%" padding="0">
+        <mj-text font-size="20px">
+
+          <dl>
+            <dt>Documento: </dt>
+            <dd>Recibo</dd>
+          </dl>
+          <dl>
+            <dt>Recibo: </dt>
+            <dd>{{recibo}}</dd>
+          </dl>
+          <dl>
+            <dt>Referencia: </dt>
+            <dd>{{referencia}}</dd>
+          </dl>
+          <dl>
+            <dt>Fecha: </dt>
+            <dd>{{fecha}}</dd>
+          </dl>
+        </mj-text>
+      </mj-column>
+
+    </mj-section>
+
+    <mj-section padding="0">
+
+      <mj-column width="50%" padding="0">
+
+      </mj-column>
+
+
+      <mj-divider border-color="#333"></mj-divider>
+
+      <mj-column width="70%" padding="0">
+        <mj-text font-size="20px">
+          <dl>
+            <dt>Cliente: </dt>
+            <dd class="capitalize">{{name}}</dd>
+          </dl>
+          <dl>
+            <dt>Cedula: </dt>
+            <dd>{{cedula}}</dd>
+          </dl>
+
+        </mj-text>
+      </mj-column>
+
+      <mj-column width="30%" padding="0">
+
+        <mj-text font-size="20px">
+        </mj-text>
+      </mj-column>
+
+      <mj-column width="100%" padding="0">
+
+        <mj-text font-size="13px">
+          {{direccion}}
+        </mj-text>
+      </mj-column>
+
+      <mj-column width="100%" padding="0">
+
+        <mj-table>
+          <tr style="border-bottom:1px solid #ecedee;text-align:left;padding:15px 0;">
+            <th width="40px" style="padding: 0 ">Factura</th>
+            <th width="40px" style="padding:0">Monto</th>
+          </tr>
+
+          {{#each lineas}}
+
+
+
+          <tr>
+            <td width="30px" style="padding: 0 0px 0 0;">{{documentoConsecutivo}}</td>
+            <td width="50px" style="padding: 0 0px 0 0;">{{monto}}</td>
+
+          </tr>
+
+
+          {{/each}}
+
+
+
+
+      </mj-column>
+
+    </mj-section>
+
+    <mj-divider border-color="#333"></mj-divider>
+
+    <mj-section class="totals ">
+
+      <mj-column class="details" width="58%" padding="0">
+        <mj-text>{{descripcion}}</mj-text>
+      </mj-column>
+
+      <mj-column class="totals" width="40%" padding="0">
+        <mj-text>
+          <dl>
+            <dt>Total: </dt>
+            <dd>{{monto}}</dd>
+          </dl>
+          <dl>
+
+
+        </mj-text>
+
+      </mj-column>
+    </mj-section>
+
+
+
+
+  </mj-body>
+</mjml>

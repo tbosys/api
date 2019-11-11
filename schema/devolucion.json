@@ -1,0 +1,233 @@
+{
+  "$id": "http://example.com/example.json",
+  "type": "object",
+  "restricted": [
+    "totalComprobante"
+  ],
+  "title": "Devolucion de Venta",
+  "key": "devolucion",
+  "namespace": "inventario",
+  "properties": {
+    "id": {
+      "$id": "/properties/id",
+      "type": "integer",
+      "title": "Id"
+    },
+    "estado": {
+      "$id": "/properties/estado",
+      "type": "string",
+      "title": "Estado",
+      "filterable": true,
+      "enum": [
+        "por anular",
+        "por aplicar",
+        "archivado",
+        "por firmar"
+      ]
+    },
+    "tipo": {
+      "$id": "/properties/tipo",
+      "type": "string",
+      "title": "Tipo",
+      "element": "select",
+      "default": "NC",
+      "enum": [
+        "FA",
+        "ND",
+        "NC"
+      ]
+    },
+    "consecutivo": {
+      "$id": "/properties/consecutivo",
+      "type": "string",
+      "title": "Consecutivo"
+    },
+    "descripcion": {
+      "$id": "/properties/descripcion",
+      "type": "string",
+      "element": "textArea",
+      "title": "Descripcion"
+    },
+    "plazo": {
+      "$id": "/properties/plazo",
+      "type": "integer",
+      "title": "Plazo"
+    },
+    "totalVenta": {
+      "$id": "/properties/totalVenta",
+      "type": "number",
+      "title": "SubTotal"
+    },
+    "totalImpuesto": {
+      "$id": "/properties/totalImpuesto",
+      "type": "number",
+      "title": "Impuesto"
+    },
+    "totalDescuentos": {
+      "$id": "/properties/totalDescuentos",
+      "type": "number",
+      "title": "Descuento"
+    },
+    "totalComprobante": {
+      "$id": "/properties/totalComprobante",
+      "type": "number",
+      "title": "Total"
+    },
+    "totalExcento": {
+      "$id": "/properties/",
+      "type": "number",
+      "title": ""
+    },
+    "totalGravado": {
+      "$id": "/properties/",
+      "type": "number",
+      "title": ""
+    },
+    "moneda": {
+      "$id": "/properties/moneda",
+      "type": "string",
+      "title": "moneda"
+    },
+    "tipoCambio": {
+      "$id": "/properties/tipoCambio",
+      "type": "number",
+      "title": "tipoCambio"
+    },
+    "saldo": {
+      "$id": "/properties/saldo",
+      "type": "number",
+      "title": "Saldo"
+    },
+    "fecha": {
+      "$id": "/properties/fecha",
+      "type": "string",
+      "title": "Fecha",
+      "filterable": true,
+      "filterRenderer": "DateFilter"
+    },
+    "approveBy": {
+      "$id": "/properties/approveBy",
+      "type": "string",
+      "title": "Aprobado por"
+    },
+    "ordenId": {
+      "$id": "/properties/ordenId",
+      "type": "integer",
+      "title": "Orden"
+    },
+    "promocionId": {
+      "$id": "/properties/promocionId",
+      "type": "integer",
+      "title": "Promocion"
+    },
+    "clienteId": {
+      "$id": "/properties/clienteId",
+      "type": "integer",
+      "title": "Cliente",
+      "table": "cliente",
+      "filterable": true,
+      "route": "cliente/findLikeName",
+      "metadataType": "cliente",
+      "element": "autocomplete",
+      "elementOptions": {
+        "primary": "name"
+      }
+    },
+    "transporteId": {
+      "$id": "/properties/transporteId",
+      "type": "integer",
+      "title": "Transporte"
+    },
+    "facturaUrl": {
+      "$id": "/properties/facturaUrl",
+      "type": "string",
+      "title": "Factura PDF"
+    },
+    "ownerId": {
+      "$id": "/properties/ownerId",
+      "type": "integer",
+      "title": "Propietario"
+    },
+    "ownerName": {
+      "$id": "/properties/ownerName",
+      "type": "string",
+      "title": "Nombre Propietario"
+    },
+    "createdBy": {
+      "$id": "/properties/createdBy",
+      "type": "string",
+      "title": "Creado por"
+    },
+    "updatedBy": {
+      "$id": "/properties/updatedBy",
+      "type": "string",
+      "title": "Actualizado por"
+    },
+    "createdAt": {
+      "$id": "/properties/createdAt",
+      "type": "string",
+      "title": "Creado"
+    },
+    "updatedAt": {
+      "$id": "/properties/updatedAt",
+      "type": "string",
+      "title": "Actualizado"
+    },
+    "vendedorId": {
+      "$id": "/properties/vendedorId",
+      "type": "integer",
+      "title": "Vendedor",
+      "table": "vendedor",
+      "metadataType": "vendedor",
+      "filterable": true,
+      "route": "vendedor/findLikeName",
+      "element": "autocomplete",
+      "width": 125,
+      "elementOptions": {
+        "primary": "name"
+      }
+    }
+  },
+  "actions": [
+    "Crear",
+    "Imprimir",
+    "Anular"
+  ],
+  "belongsTo": [
+    "cliente",
+    "orden",
+    "vendedor"
+  ],
+  "required": [
+    "clienteId"
+  ],
+  "layout": [
+    {
+      "title": "Información",
+      "cols": 4,
+      "fields": [
+        "clienteId",
+        "tipo",
+        "descripcion"
+      ]
+    },
+    {
+      "cols": 8,
+      "title": "Totales",
+      "fields": [
+        "totalComprobante"
+      ]
+    }
+  ],
+  "table": {
+    "sum": [],
+    "fields": [
+      "clienteId",
+      "vendedorId",
+      "estado",
+      "consecutivo",
+      "tipo",
+      "facturaUrl"
+    ]
+  }
+}

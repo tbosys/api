@@ -1,0 +1,124 @@
+{
+    "$id": "http://example.com/facturaCxp.json",
+    "title": "Contactos de proveedores",
+    "limit": 1000,
+    "maxLimit": 5000,
+    "namespace": "cxp",
+    "key": "proveedorContacto",
+    "type": "object",
+    "restricted": [],
+    "properties": {
+      "id": {
+        "$id": "/properties/id",
+        "type": "integer",
+        "title": "Id"
+      },
+      "activo": {
+        "$id": "/properties/activo",
+        "type": "boolean",
+        "title": "Activo",
+        "formatter": "BooleanFormatter",
+        "default": true
+      },
+      "name": {
+        "$id": "/properties/name",
+        "type": "string",
+        "title": "Nombre"
+      },
+      "cedula": {
+        "$id": "/properties/cedula",
+        "type": "string",
+        "title": "Cédula",
+        "minLength": 9,
+        "maxLength": 12,
+        "pattern": "[0-9]"
+      },
+      "email": {
+        "$id": "/properties/email",
+        "type": "string",
+        "title": "Email "
+      },
+      "mobile": {
+        "$id": "/properties/mobile",
+        "type": "string",
+        "title": "Mobile",
+        "minLength": 9,
+        "maxLength": 15,
+        "pattern": "^[0-9-+()]+[0-9]$"
+      },
+      "rol": {
+        "$id": "/properties/rol",
+        "type": "string",
+        "title": "Rol"
+      },
+      "descripcion": {
+        "$id": "/properties/descripcion",
+        "type": "string",
+        "title": "Descripcion",
+        "width": 350
+      },
+      "proveedorId": {
+        "$id": "/properties/proveedorId",
+        "type": "integer",
+        "title": "Proveedor",
+        "table": "proveedor",
+        "route": "proveedor/findLikeName",
+        "element": "autocomplete",
+        "filterable": true,
+        "elementOptions": {
+          "primary": "name"
+        },
+        "lockOn": "*",
+        "width": 200,
+        "locked": true
+      },
+      "createdBy": {
+        "$id": "/properties/createdBy",
+        "type": "string",
+        "title": "Creado por"
+      },
+      "updatedBy": {
+        "$id": "/properties/updatedBy",
+        "type": "string",
+        "title": "Actualizado por"
+      },
+      "createdAt": {
+        "$id": "/properties/createdAt",
+        "type": "string",
+        "title": "Creado"
+      },
+      "updatedAt": {
+        "$id": "/properties/updatedAt",
+        "type": "string",
+        "title": "Actualizado"
+      }
+    },
+    "belongsTo": ["proveedor"],
+    "required": ["proveedorId","name"],
+    "actions": ["Crear","Editar"],
+    "layout": [
+      {
+        "title": "Legal",
+        "cols": 8,
+        "fields": ["proveedorId","name","email","mobile"]
+      },
+      {
+        "title": "Descripcion",
+        "cols": 4,
+        "fields": ["activo","rol","descripcion"]
+      }
+    ],
+    "table": {
+      "sum": [],
+      "fields": [
+        "name",
+        "proveedorId",
+        "email",
+        "mobile",
+        "rol",
+        "descripcion",
+        "activo"
+      ]
+    }
+  }
+  

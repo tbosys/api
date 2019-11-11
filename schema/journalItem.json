@@ -1,0 +1,119 @@
+{
+  "$id": "http://example.com/example.json",
+  "type": "object",
+  "title": "Linea Movimiento",
+  "limit": 100,
+  "maxLimit": 500,
+  "key": "journalItem",
+  "namespace": "contabilidad",
+  "restricted": [],
+  "properties": {
+    "id": {
+      "$id": "/properties/id",
+      "type": "integer",
+      "title": "Id"
+    },
+    "descripcion": {
+      "$id": "/properties/descripcion",
+      "type": "string",
+      "title": "descripcion",
+      "filterable": true,
+      "sortable": true,
+      "width": 200
+    },
+    "_rowId": {
+      "$id": "/properties/_rowId",
+      "type": "integer",
+      "title": "Linea"
+    },
+    "debito": {
+      "$id": "/properties/debito",
+      "type": "number",
+      "title": "Debito",
+      "filterable": true,
+      "sortable": true
+    },
+    "credito": {
+      "$id": "/properties/credito",
+      "type": "number",
+      "title": "Credito",
+      "filterable": true,
+      "sortable": true
+    },
+    "startingBalance": {
+      "$id": "/properties/startingBalance",
+      "type": "number",
+      "title": "Balance Inicial",
+      "filterable": true,
+      "sortable": true
+    },
+    "endingBalance": {
+      "$id": "/properties/endingBalance",
+      "type": "number",
+      "title": "Balance Final",
+      "filterable": true,
+      "sortable": true
+    },
+    "accountId": {
+      "$id": "/properties/journalId",
+      "type": "integer",
+      "title": "Cuenta Codigo",
+      "table": "account",
+      "sortable": true,
+      "fields": [["name","codigo"]],
+      "filterable": true
+    },
+    "accountName": {
+      "$id": "/properties/accountName",
+      "type": "string",
+      "title": "Cuenta",
+      "filterable": true,
+      "sortable": true,
+      "select": "account.name",
+      "width": 300
+    },
+    "accountCodigo": {
+      "$id": "/properties/accountCodigo",
+      "type": "string",
+      "title": "Cuenta Codigo",
+      "filterable": true,
+      "sortable": true,
+      "select": "account.codigo"
+    },
+    "journalId": {
+      "$id": "/properties/journalId",
+      "type": "integer",
+      "title": "Asiento",
+      "table": "journal",
+      "sortable": true,
+      "fields": [["fecha","name"]],
+      "filterable": true
+    },
+    "journalName": {
+      "$id": "/properties/journalName",
+      "type": "string",
+      "title": "Asiento",
+      "filterable": true,
+      "sortable": true,
+      "select": "journal.name"
+    },
+    "journalFecha": {
+      "$id": "/properties/journalFecha",
+      "type": "string",
+      "title": "Fecha Asiento",
+      "filterable": true,
+      "filterRenderer": "DateFilter",
+      "sortable": true,
+      "select": "journal.fecha"
+    }
+  },
+  "belongsTo": [
+    "account","journal"
+  ],
+  "actions": [],
+  "layout": [],
+  "table": {
+    "sum": ["debito","credito"],
+    "fields": ["accountName","accountCodigo","journalName","journalFecha","descripcion","debito", "credito", "startingBalance", "endingBalance"]
+  }
+}

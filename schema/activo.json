@@ -1,0 +1,185 @@
+{
+  "$id": "http://example.com/example.json",
+  "type": "object",
+  "title": "Activo",
+  "key": "activo",
+  "namespace": "contabilidad",
+  "restricted": [],
+  "properties": {
+    "id": {
+      "$id": "/properties/id",
+      "type": "integer",
+      "title": "Id"
+    },
+    "name": {
+      "$id": "/properties/estado",
+      "type": "string",
+      "title": "Nombre",
+      "filterable": true,
+      "editable": true,
+      "width": 160
+    },
+    "proveedorId": {
+      "$id": "/properties/proveedorId",
+      "type": "integer",
+      "title": "Proveedor",
+      "table": "proveedor",
+      "metadataType": "proveedor",
+      "filterable": true,
+      "route": "proveedor/findLikeName",
+      "element": "autocomplete",
+      "width": 250,
+      "elementOptions": {
+        "primary": "name"
+      }
+    },
+    "activo": {
+      "$id": "/properties/activo",
+      "type": "boolean",
+      "title": "Activo",
+      "filterable": true,
+      "default": true,
+      "editable": true,
+      "width": 100
+    },
+    "descripcion": {
+      "$id": "/properties/descripcion",
+      "type": "string",
+      "title": "Descripcion",
+      "filterable": true,
+      "editable": true,
+      "width": 300
+    },
+    "departamento": {
+      "$id": "/properties/descripcion",
+      "type": "string",
+      "title": "Departamento",
+      "filterable": true,
+      "editable": true,
+      "width": 200
+    },
+    "historialDepreciacion": {
+      "$id": "/properties/historialDepreciacion",
+      "type": "string",
+      "title": "Depreciacion",
+      "width": 400
+    },
+    "numero": {
+      "$id": "/properties/descripcion",
+      "type": "string",
+      "title": "Numero",
+      "filterable": true,
+      "editable": true,
+      "width": 150
+    },
+
+    "tipoNumero": {
+      "$id": "/properties/tipoNumero",
+      "type": "string",
+      "title": "Tipo Numero",
+      "element": "select",
+      "filterable": true,
+      "defaultTo": "serie",
+      "default": "serie",
+      "enum": ["serie", "registro", "VIN", "matricula"]
+    },
+
+    "fechaCompra": {
+      "$id": "/properties/fechaCompra",
+      "type": "string",
+      "title": "Fecha Compra",
+      "element": "date",
+      "filterable": true,
+      "filterRenderer": "DateFilter",
+      "sortable": true
+    },
+
+    "valorOriginal": {
+      "$id": "/properties/valorOriginal",
+      "type": "number",
+      "title": "Valor Original"
+    },
+
+    "valorActual": {
+      "$id": "/properties/valorActual",
+      "type": "number",
+      "title": "Valor Actual"
+    },
+    "ownerId": {
+      "$id": "/properties/ownerId",
+      "type": "integer",
+      "title": "Responsable",
+      "table": "owner",
+      "metadataType": "owner",
+      "filterable": true,
+      "route": "owner/findLikeName",
+      "element": "autocomplete",
+      "width": 250,
+      "elementOptions": {
+        "primary": "name"
+      }
+    },
+    "createdBy": {
+      "$id": "/properties/createdBy",
+      "type": "string",
+      "title": "Creado por"
+    },
+    "updatedBy": {
+      "$id": "/properties/updatedBy",
+      "type": "string",
+      "title": "Actualizado por"
+    },
+    "createdAt": {
+      "$id": "/properties/createdAt",
+      "type": "string",
+      "title": "Creado"
+    },
+    "updatedAt": {
+      "$id": "/properties/updatedAt",
+      "type": "string",
+      "title": "Actualizado"
+    }
+  },
+  "belongsTo": ["owner", "proveedor"],
+  "actions": ["Crear", "Editar"],
+  "layout": [
+    {
+      "title": "Información",
+      "cols": 4,
+      "fields": ["name", "ownerId", "departamento", "activo"]
+    },
+    {
+      "title": "Sobre el activo",
+      "cols": 4,
+      "fields": ["proveedorId", "numero", "tipoNumero", "fechaCompra"]
+    },
+    {
+      "title": "Monto",
+      "cols": 4,
+      "fields": ["valorOriginal", "valorActual"]
+    },
+    {
+      "title": "Detalles",
+      "cols": 12,
+      "fieldSize": 12,
+      "fields": ["descripcion", "historialDepreciacion"]
+    }
+  ],
+  "table": {
+    "sum": ["monto"],
+    "fields": [
+      "id",
+      "name",
+      "proveedorId",
+      "departamento",
+      "ownerId",
+      "numero",
+      "tipoNumero",
+      "fechaCompra",
+      "valorOriginal",
+      "valorActual",
+      "activo"
+    ]
+  },
+  "batch": []
+}

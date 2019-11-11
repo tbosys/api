@@ -1,0 +1,469 @@
+{
+  "$id": "http://example.com/example.json",
+  "type": "object",
+  "restricted": ["saldo", "totalComprobante"],
+  "title": "Documentos de Ventas",
+  "key": "documento",
+  "namespace": "facturacion",
+  "shareLevel": 5,
+  "maxLimit": 20000,
+  "properties": {
+    "id": {
+      "$id": "/properties/id",
+      "type": "integer",
+      "title": "Id",
+      "locked": true
+    },
+    "estado": {
+      "$id": "/properties/estado",
+      "type": "string",
+      "title": "Estado",
+      "filterable": true,
+      "filterRenderer": "SelectFilter",
+      "width": 100,
+      "enum": ["por firmar", "por aplicar", "por revisar", "por anular", "por archivar", "archivado"]
+    },
+    "negociado": {
+      "$id": "/properties/negociado",
+      "type": "boolean",
+      "title": "Negociado",
+      "default": false,
+      "filterable": true,
+      "sortable": true
+    },
+    "tipo": {
+      "$id": "/properties/tipo",
+      "type": "string",
+      "title": "Tipo",
+      "element": "select",
+      "filterRenderer": "SelectFilter",
+      "filterable": true,
+      "default": "NC",
+      "enum": ["FA", "ND", "NC"]
+    },
+    "consecutivo": {
+      "$id": "/properties/consecutivo",
+      "type": "string",
+      "title": "Consecutivo",
+      "filterable": true,
+      "sortable": true,
+      "width": 100,
+      "locked": true
+    },
+    "descripcion": {
+      "$id": "/properties/descripcion",
+      "type": "string",
+      "element": "textArea",
+      "title": "Descripcion",
+      "filterable": true,
+      "width": 300,
+      "formatter": "TextFormatter"
+    },
+    "plazo": {
+      "$id": "/properties/plazo",
+      "type": "integer",
+      "title": "Plazo",
+      "filterable": true,
+      "sortable": true
+    },
+    "totalVentaNeta": {
+      "$id": "/properties/totalVentaNeta",
+      "type": "number",
+      "title": "Total Neto"
+    },
+    "totalImpuesto": {
+      "$id": "/properties/totalImpuesto",
+      "type": "number",
+      "title": "Impuesto"
+    },
+    "totalDescuentos": {
+      "$id": "/properties/totalDescuentos",
+      "type": "number",
+      "title": "Descuento"
+    },
+
+    "totalComprobante": {
+      "$id": "/properties/totalComprobante",
+      "type": "number",
+      "limit": 100,
+      "maxLimit": 5000,
+      "title": "Total",
+
+      "filterRenderer": "NumericFilter",
+      "filterable": true,
+      "sortable": true
+    },
+    "totalExcento": {
+      "$id": "/properties/",
+      "type": "number",
+      "title": "Exento",
+      "filterRenderer": "NumericFilter",
+      "filterable": true,
+      "sortable": true
+    },
+    "totalGravado": {
+      "$id": "/properties/",
+      "type": "number",
+      "title": "Gravado"
+    },
+    "moneda": {
+      "$id": "/properties/moneda",
+      "type": "string",
+      "title": "moneda",
+      "enum": ["CRC", "USD"],
+      "element": "select",
+      "filterRenderer": "SelectFilter",
+      "filterable": true,
+      "default": "CRC"
+    },
+    "tipoCambio": {
+      "$id": "/properties/tipoCambio",
+      "type": "number",
+      "title": "tipoCambio",
+      "default": 1
+    },
+    "fecha": {
+      "$id": "/properties/fecha",
+      "type": "string",
+      "title": "Fecha",
+      "filterable": true,
+      "sortable": true,
+      "filterRenderer": "DateFilter"
+    },
+    "approveBy": {
+      "$id": "/properties/approveBy",
+      "type": "string",
+      "title": "Aprobado por"
+    },
+    "ordenId": {
+      "$id": "/properties/ordenId",
+      "type": "integer",
+      "title": "Orden"
+    },
+    "promocionId": {
+      "$id": "/properties/promocionId",
+      "type": "integer",
+      "title": "Promocion"
+    },
+    "clienteId": {
+      "$id": "/properties/clienteId",
+      "type": "integer",
+      "title": "Cliente",
+      "table": "cliente",
+      "filterable": true,
+      "route": "cliente/findLikeName",
+      "metadataType": "cliente",
+      "element": "autocomplete",
+      "elementOptions": {
+        "primary": "name"
+      },
+      "width": 220
+    },
+    "tags": {
+      "$id": "/properties/tags",
+      "type": "integer",
+      "title": "Tag",
+      "table": "cliente",
+      "filterable": true,
+      "width": 350,
+      "select": "cliente.tags"
+    },
+    "documentoTags": {
+      "$id": "/properties/documentoTags",
+      "type": "string",
+      "title": "Doc Tags",
+      "element": "multiselect",
+      "filterable": true,
+      "sortable": true,
+      "table": "tag",
+      "route": "tag/allWithName",
+      "elementOptions": {
+        "primary": "name"
+      },
+      "width": 200
+    },
+    "transporteId": {
+      "$id": "/properties/transporteId",
+      "type": "integer",
+      "title": "Transporte"
+    },
+    "pdf": {
+      "$id": "/properties/pdf",
+      "type": "string",
+      "title": "PDF",
+      "formatter": "LinkFormatter"
+    },
+    "xml": {
+      "$id": "/properties/xml",
+      "type": "string",
+      "title": "XML",
+      "formatter": "LinkFormatter"
+    },
+    "respuestaXml": {
+      "$id": "/properties/respuestaXml",
+      "type": "string",
+      "title": "XMLR",
+      "formatter": "LinkFormatter"
+    },
+    "descripcionEstado": {
+      "$id": "/properties/descripcionEstado",
+      "type": "string",
+      "title": "Detalle del Estado",
+      "width": 400,
+      "formatter": "TextFormatter"
+    },
+    "informacionReferencia": {
+      "$id": "/properties/informacionReferencia",
+      "type": "string",
+      "title": "Referencia",
+      "formatter": "TextFormatter"
+    },
+    "contado": {
+      "width": 100,
+      "sortable": true,
+      "$id": "/properties/contado",
+      "type": "string",
+      "enum": ["contado", "credito"],
+      "title": "Contado",
+      "filterable": true,
+      "select": "(case when documento.plazo = 0 then 'contado' else 'credito' end)",
+      "filterRenderer": "SelectFilter"
+    },
+    "anulacion": {
+      "$id": "/properties/anulacion",
+      "type": "boolean",
+      "title": "Anulado",
+      "select": "(case when documentoAnuladorId or documentoAnuladoDeId then true else false end)",
+      "filterable": true,
+      "filterRenderer": "BooleanFilter",
+      "formatter": "BooleanFormatter"
+    },
+    "financiero": {
+      "$id": "/properties/financiero",
+      "type": "boolean",
+      "title": "Financiero",
+      "filterable": true,
+      "filterRenderer": "BooleanFilter",
+      "formatter": "BooleanFormatter"
+    },
+
+    "ownerId": {
+      "$id": "/properties/ownerId",
+      "type": "integer",
+      "title": "Propietario",
+      "table": "owner",
+      "filterable": true,
+      "sortable": true,
+      "route": "owner/findLikeName",
+      "metadataType": "owner",
+      "element": "autocomplete",
+      "select": "owner.name",
+      "elementOptions": {
+        "primary": "name"
+      },
+      "width": 250
+    },
+    "comisiona": {
+      "$id": "/properties/comisiona",
+      "type": "boolean",
+      "title": "Comision",
+      "filterable": true,
+      "sortable": true,
+      "select": "owner.comisiona"
+    },
+    "documentoAnuladoDeId": {
+      "$id": "/properties/documentoAnuladoDeId",
+      "type": "number",
+      "title": "Anulado de Id",
+      "filterable": true,
+      "sortable": true
+    },
+
+    "createdBy": {
+      "$id": "/properties/createdBy",
+      "type": "string",
+      "title": "Creado por"
+    },
+    "updatedBy": {
+      "$id": "/properties/updatedBy",
+      "type": "string",
+      "title": "Actualizado por"
+    },
+    "createdAt": {
+      "$id": "/properties/createdAt",
+      "type": "string",
+      "title": "Creado"
+    },
+    "updatedAt": {
+      "$id": "/properties/updatedAt",
+      "type": "string",
+      "title": "Actualizado"
+    },
+
+    "zonaId": {
+      "$id": "/properties/zonaId",
+      "type": "string",
+      "title": "Ruta",
+      "filterable": true,
+      "sortable": true,
+      "select": "zona.name"
+    },
+    "segmentoId": {
+      "$id": "/properties/segmentoId",
+      "type": "string",
+      "title": "Segmento",
+      "filterable": true,
+      "sortable": true,
+      "select": "segmento.name"
+    },
+    "saldoId": {
+      "$id": "/properties/saldoId",
+      "type": "number",
+      "title": "Saldo",
+      "table": "saldo",
+      "filterable": true,
+      "metadataType": "saldo",
+      "element": "autocomplete",
+      "select": "saldo.total",
+      "elementOptions": {
+        "primary": "name"
+      },
+      "width": 120
+    },
+
+    "antiguedad": {
+      "$id": "/properties/antiguedad",
+      "type": "integer",
+      "title": "Antiguedad",
+      "select": "DATEDIFF(NOW(),saldo.fecha)",
+      "filterComparator": "=",
+      "filterable": true,
+      "calculated": true,
+      "sortable": true
+    }
+  },
+  "actions": [
+    "Ver",
+    {
+      "title": "Anular",
+      "then": "confirm",
+      "key": "anular"
+    },
+    "Reintentar",
+    "Reenviar"
+  ],
+  "belongsTo": ["cliente", "owner", "cliente>zona", "cliente>segmento"],
+  "belongsIn": ["saldo"],
+  "required": ["clienteId"],
+  "view": {
+    "fields": [
+      "id",
+      "consecutivo",
+      "clienteId",
+      "ownerId",
+      "estado",
+      "saldoId",
+      "antiguedad",
+      "fecha",
+      "plazo",
+      "tipo",
+      "zonaId",
+      "segmentoId",
+      "anulacion",
+      "financiero",
+      "totalVentaNeta",
+      "totalExcento",
+      "totalDescuentos",
+      "totalImpuesto",
+      "totalComprobante",
+      "contado",
+      "pdf",
+      "xml",
+      "informacionReferencia",
+      "descripcion",
+      "descripcionEstado",
+      "tags",
+      "documentoTags",
+      "comisiona",
+      "negociado"
+    ],
+    "widgets": [],
+
+    "relatedFields": [
+      {
+        "route": "movimientoInventario/query",
+        "key": "movimientoInventario",
+        "title": "Productos",
+        "table": "movimientoInventario",
+        "fields": ["id", "__productoId", "cantidad", "precio", "descuentoUnitario"],
+        "filters": [["documento.id", "=", "$"]]
+      },
+      {
+        "route": "lineaPagoDocumento/query",
+        "key": "lineaPagoDocumento",
+        "title": "Pagos",
+        "table": "lineaPagoDocumento",
+        "fields": ["id", "fecha", "monto", "plazo"],
+        "filters": [["lineaPagoDocumento.documentoId", "=", "$"]]
+      },
+      {
+        "route": "comisionHistorico/query",
+        "key": "comisionHistorico",
+        "title": "Comisiones",
+        "table": "comisionHistorico",
+        "fields": ["id", "fecha", "monto"],
+        "filters": [["movimientoInventario.documentoId", "=", "$"]]
+      }
+    ]
+  },
+
+  "layout": [
+    {
+      "title": "Información",
+      "cols": 4,
+      "fields": ["clienteId", "tipo", "descripcion"]
+    },
+    {
+      "cols": 8,
+      "title": "Totales",
+      "fields": ["totalComprobante", "tipoCambio", "moneda"]
+    }
+  ],
+
+  "graph": ["clienteId", "zonaId", "segmentoId", "fecha", "totalComprobante", "totalVentaNeta"],
+  "table": {
+    "sum": ["totalVentaNeta", "totalImpuesto", "totalComprobante", "saldoId"],
+    "fields": [
+      "id",
+      "consecutivo",
+      "clienteId",
+      "ownerId",
+      "estado",
+      "saldoId",
+      "antiguedad",
+      "fecha",
+      "plazo",
+      "tipo",
+      "zonaId",
+      "segmentoId",
+      "anulacion",
+      "financiero",
+      "totalVentaNeta",
+      "totalExcento",
+      "totalDescuentos",
+      "totalImpuesto",
+      "totalComprobante",
+      "contado",
+      "pdf",
+      "xml",
+      "informacionReferencia",
+      "descripcion",
+      "descripcionEstado",
+      "tags",
+      "documentoTags",
+      "comisiona",
+      "respuestaXml",
+      "documentoAnuladoDeId"
+    ]
+  }
+}

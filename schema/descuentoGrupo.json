@@ -1,0 +1,83 @@
+{
+  "$id": "http://example.com/example.json",
+  "type": "object",
+  "limit": 100,
+  "maxLimit": 500,
+  "key": "descuentoGrupo",
+  "title": "Descuento Grupo",
+  "namespace": "administracion",
+  "restricted": [],
+  "properties": {
+    "id": {
+      "$id": "/properties/id",
+      "type": "integer",
+      "title": "Id"
+    },
+    "descuento": {
+      "$id": "/properties/descuento",
+      "type": "integer",
+      "title": "Descuento"
+    },
+    "productoId": {
+      "$id": "/properties/productoId",
+      "type": "integer",
+      "title": "Producto",
+      "table": "producto",
+      "metadataType": "producto",
+      "filterable": true,
+      "route": "producto/findLikeName",
+      "element": "autocomplete",
+      "elementOptions": {
+        "primary": "name"
+      },
+      "width": 300
+    },
+    "grupoId": {
+      "$id": "/properties/grupoId",
+      "type": "integer",
+      "title": "Grupo",
+      "table": "grupo",
+      "metadataType": "grupo",
+      "filterable": true,
+      "route": "grupo/findLikeName",
+      "element": "autocomplete",
+      "elementOptions": {
+        "primary": "name"
+      }
+    },
+    "createdBy": {
+      "$id": "/properties/createdBy",
+      "type": "string",
+      "title": "Creado por"
+    },
+    "updatedBy": {
+      "$id": "/properties/updatedBy",
+      "type": "string",
+      "title": "Actualizado por"
+    },
+    "createdAt": {
+      "$id": "/properties/createdAt",
+      "type": "string",
+      "title": "Creado"
+    },
+    "updatedAt": {
+      "$id": "/properties/updatedAt",
+      "type": "string",
+      "title": "Actualizado"
+    }
+  },
+  "belongsTo": ["producto", "grupo"],
+  "required": ["descuento"],
+  "layout": [
+    {
+      "title": "Información",
+      "fields": ["productoId", "grupoId", "descuento"]
+    }
+  ],
+  "actions": ["Crear", "Editar"],
+  "table": {
+    "sum": [],
+    "fields": ["productoId", "grupoId", "descuento"]
+  },
+  "batch": ["productoId", "descuento", "grupoId"]
+}

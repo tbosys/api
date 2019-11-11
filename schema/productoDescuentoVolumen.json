@@ -1,0 +1,80 @@
+{
+  "$id": "http://example.com/example.json",
+  "type": "object",
+  "limit": 100,
+  "maxLimit": 500,
+  "key": "productoDescuentoVolumen",
+  "title": "Descuento Volumen",
+  "namespace": "venta",
+  "properties": {
+    "id": {
+      "$id": "/properties/id",
+      "type": "integer",
+      "title": "Id"
+    },
+    "name": {
+      "$id": "/properties/name",
+      "type": "string",
+      "title": "name"
+    },
+    "descuento": {
+      "$id": "/properties/descuento",
+      "type": "number",
+      "title": "descuento",
+      "min": 1,
+      "max": 99
+    },
+    "estado": {
+      "$id": "/properties/estado",
+      "type": "string",
+      "title": "Estado",
+      "filterable": true,
+      "sortabe": true,
+      "default": "por aprobar",
+      "enum": ["por aprobar", "aprobado"]
+    },
+    "productoId": {
+      "$id": "/properties/productoId",
+      "type": "integer",
+      "title": "Producto",
+      "table": "producto",
+      "metadataType": "producto",
+      "filterable": true,
+      "route": "producto/findLikeName",
+      "element": "autocomplete",
+      "elementOptions": {
+        "primary": "name"
+      },
+      "width": 300
+    },
+    "cantidadMaxima": {
+      "$id": "/properties/cantidadMaxima",
+      "type": "number",
+      "title": "Maximo",
+      "sortable": true,
+      "min": 0,
+      "width": 120
+    },
+    "cantidadMinima": {
+      "$id": "/properties/cantidadMinima",
+      "type": "number",
+      "title": "Minimo",
+      "sortable": true,
+      "min": 0,
+      "width": 120
+    }
+  },
+  "belongsTo": ["producto"],
+  "layout": [
+    {
+      "title": "Información",
+      "fields": ["name", "cantidadMinima", "cantidadMaxima", "descuento"]
+    }
+  ],
+  "actions": ["Crear", "Editar", "Borrar", "Aprobar"],
+  "table": {
+    "sum": [],
+    "fields": ["id", "name", "estado", "cantidadMinima", "cantidadMaxima", "descuento"]
+  },
+  "batch": []
+}

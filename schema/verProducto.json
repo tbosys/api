@@ -1,0 +1,86 @@
+{
+    "$id": "http://example.com/example.json",
+    "type": "object",
+    "key": "costos",
+    "title": "Costos Actuales con Valor",
+    "namespace": "auditoria",
+    "restricted": [],
+    "properties": {
+      "id": {
+        "$id": "/properties/id",
+        "type": "integer",
+        "title": "Id",
+        "default": 0
+      },
+      "name": {
+        "$id": "/properties/name",
+        "type": "string",
+        "title": "Nombre",
+        "width": 350,
+        "filterable": true,
+        "sortable":true
+      },
+      "familia": {
+        "$id": "/properties/familia",
+        "type": "string",
+        "title": "Familia",
+        "width": 150,
+        "filterable": true
+      },
+      "categoria": {
+        "$id": "/properties/categoria",
+        "type": "string",
+        "title": "Categoria",
+        "width": 150,
+        "filterable": true
+      },
+      "precio": {
+        "$id": "/properties/precio",
+        "type": "number",
+        "title": "Precio"
+      },
+      "inventario": {
+        "$id": "/properties/inventario",
+        "type": "number",
+        "title": "Inventario"
+      },
+      "costo": {
+        "$id": "/properties/costo",
+        "type": "number",
+        "title": "Costo"
+      },
+      "descuento": {
+        "$id": "/properties/descuento",
+        "type": "number",
+        "title": "Descuento"
+      },
+      "precioNeta": {
+        "$id": "/properties/inventario",
+        "type": "number",
+        "title": "PrecioNeto"
+      },
+      "utilidad": {
+        "$id": "/properties/inventario",
+        "type": "number",
+        "title": "Utilidad"
+      }
+    },
+    "required": [],
+    "belongsTo": [],
+    "actions": [],
+    "layout": [],
+    "table": {
+      "sum": [],
+      "fields": [
+        "name",
+        "familia",
+        "categoria",
+        "inventario",
+        "costo",
+        "precio",
+        "descuento",
+        "precioNeta",
+        "utilidad"
+      ]
+    }
+  }

@@ -1,0 +1,337 @@
+service: crm
+
+package:
+  exclude:
+    - "**/node_modules/aws-sdk/**"
+
+plugins:
+  - serverless-offline
+  - serverless-dotenv-plugin
+  - serverless-prune-plugin
+  - serverless-plugin-aws-alerts
+
+custom:
+  defaultRegion: us-east-1
+  defaultEnvironmentGroup: dev-staging
+  region: ${opt:region, self:custom.defaultRegion}
+  stage: ${opt:stage, env:USER}
+  objectPrefix: "${self:service}-${self:custom.stage}"
+  prune:
+    automatic: true
+    number: 10
+  alerts:
+    dashboards: true
+    topics:
+      ok: arn:aws:sns:us-east-1:177120553227:cloudwatchAlert
+      alarm: arn:aws:sns:us-east-1:177120553227:cloudwatchAlert
+      insufficientData: arn:aws:sns:us-east-1:177120553227:cloudwatchAlert
+    definitions: # these defaults are merged with your definitions
+      functionErrors:
+        period: 60 # override period
+
+# You can pin your service to only deploy with a specific Serverless version
+# Check out our docs for more details
+# frameworkVersion: "=X.X.X"
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+  apiGateway:
+    - ${self:custom.alias.${opt:stage, self:provider.stage}}
+
+  # you can overwrite defaults here
+  #  stage: dev
+  #  region: us-east-1
+
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "dynamodb:*"
+      Resource: "*"
+    - Effect: "Allow"
+      Action:
+        - "ssm:*"
+      Resource: "*"
+    - Effect: "Allow"
+      Action:
+        - "states:*"
+      Resource: "*"
+    - Effect: "Allow"
+      Action:
+        - "lambda:*"
+      Resource: "*"
+    - Effect: "Allow"
+      Action:
+        - "ses:*"
+      Resource: "*"
+    - Effect: "Allow"
+      Action:
+        - "sqs:*"
+      Resource: "*"
+    - Effect: "Allow"
+      Action:
+        - "s3:*"
+      Resource: "*"
+    - Effect: "Allow" # xray permissions (required)
+      Action:
+        - "xray:PutTraceSegments"
+        - "xray:PutTelemetryRecords"
+      Resource:
+        - "*"
+
+functions:
+  createDatabase:
+    handler: apps/createDatabase.app
+    timeout: 130
+    memorySize: 1028
+    alarms: # merged with function alarms
+      - functionErrors
+    environment:
+      NODE_ENV: ${self:custom.stage}
+      DB_PASSWORD: ${ssm:DB_PASSWORD}
+  day:
+    handler: alarms/day.day
+    timeout: 30
+    memorySize: 128
+    alarms: # merged with function alarms
+      - functionErrors
+    environment:
+      NODE_ENV: ${self:custom.stage}
+    events:
+      - schedule: cron(59 23 * * ? *)
+
+  morning:
+    handler: alarms/morning.morning
+    timeout: 130
+    memorySize: 1028
+    alarms: # merged with function alarms
+      - functionErrors
+    environment:
+      NODE_ENV: ${self:custom.stage}
+    events:
+      - schedule: cron(59 13 * * ? *)
+  hour:
+    handler: alarms/hour.hour
+    timeout: 30
+    memorySize: 128
+    alarms: # merged with function alarms
+      - functionErrors
+    environment:
+      NODE_ENV: ${self:custom.stage}
+    events:
+      - schedule: cron(59 * * * ? *)
+
+  api:
+    handler: handler.api
+    timeout: 30
+    memorySize: 824
+    environment:
+      NODE_ENV: ${self:custom.stage}
+      DB_PASSWORD: ${ssm:DB_PASSWORD}
+    alarms: # merged with function alarms
+      - functionErrors
+    events:
+      - http:
+          path: crm/{proxy+}
+          method: ANY
+          cors: true
+
+      - http:
+          path: api/crm/{proxy+}
+          method: ANY
+          cors: true
+resources:
+  Resources:
+    TareaTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: "${self:custom.stage}Tarea"
+        AttributeDefinitions:
+          - AttributeName: accountTypeId
+            AttributeType: S
+          - AttributeName: sortKey
+            AttributeType: S
+          - AttributeName: estadoOwnerId
+            AttributeType: S
+          - AttributeName: account
+            AttributeType: S
+
+        KeySchema:
+          - AttributeName: accountTypeId
+            KeyType: HASH
+          - AttributeName: sortKey
+            KeyType: RANGE
+
+        GlobalSecondaryIndexes:
+          - IndexName: "estado"
+            KeySchema:
+              - AttributeName: "account"
+                KeyType: "HASH"
+              - AttributeName: "estadoOwnerId"
+                KeyType: "RANGE"
+            Projection:
+              ProjectionType: "ALL"
+
+          - IndexName: "accountTypeId"
+            KeySchema:
+              - AttributeName: "sortKey"
+                KeyType: "HASH"
+            Projection:
+              ProjectionType: "ALL"
+
+        BillingMode: PAY_PER_REQUEST
+
+    NotaTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: "${self:custom.stage}Nota"
+        AttributeDefinitions:
+          - AttributeName: account
+            AttributeType: S
+          - AttributeName: typeid
+            AttributeType: S
+
+        KeySchema:
+          - AttributeName: account
+            KeyType: HASH
+          - AttributeName: typeid
+            KeyType: RANGE
+
+        BillingMode: PAY_PER_REQUEST
+
+    SoporteTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: "${self:custom.stage}Soporte"
+        AttributeDefinitions:
+          - AttributeName: account
+            AttributeType: S
+          - AttributeName: estadoOwnerId
+            AttributeType: S
+
+        KeySchema:
+          - AttributeName: account
+            KeyType: HASH
+          - AttributeName: estadoOwnerId
+            KeyType: RANGE
+
+        BillingMode: PAY_PER_REQUEST
+
+    AuditTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: "${self:custom.stage}Audit"
+        AttributeDefinitions:
+          - AttributeName: account
+            AttributeType: S
+          - AttributeName: typeid
+            AttributeType: S
+          - AttributeName: ownerId
+            AttributeType: N
+
+        TimeToLiveSpecification:
+          AttributeName: ttl
+          Enabled: true
+
+        KeySchema:
+          - AttributeName: account
+            KeyType: HASH
+          - AttributeName: typeid
+            KeyType: RANGE
+
+        GlobalSecondaryIndexes:
+          - IndexName: "owner"
+            KeySchema:
+              - AttributeName: "account"
+                KeyType: "HASH"
+              - AttributeName: "ownerId"
+                KeyType: "RANGE"
+            Projection:
+              ProjectionType: "ALL"
+
+        BillingMode: PAY_PER_REQUEST
+
+    LogTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: "${self:custom.stage}Log"
+        AttributeDefinitions:
+          - AttributeName: account
+            AttributeType: S
+          - AttributeName: timestamp
+            AttributeType: N
+          - AttributeName: api
+            AttributeType: S
+
+        TimeToLiveSpecification:
+          AttributeName: ttl
+          Enabled: true
+
+        KeySchema:
+          - AttributeName: account
+            KeyType: HASH
+          - AttributeName: timestamp
+            KeyType: RANGE
+
+        GlobalSecondaryIndexes:
+          - IndexName: "apiIndex"
+            KeySchema:
+              - AttributeName: api
+                KeyType: "HASH"
+              - AttributeName: timestamp
+                KeyType: "RANGE"
+            Projection:
+              ProjectionType: "ALL"
+
+        BillingMode: PAY_PER_REQUEST
+
+    AccountTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: "${self:custom.stage}Account"
+        AttributeDefinitions:
+          - AttributeName: cedula
+            AttributeType: S
+
+        KeySchema:
+          - AttributeName: cedula
+            KeyType: HASH
+
+        BillingMode: PAY_PER_REQUEST
+
+    EmailTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: "${self:custom.stage}Email"
+        AttributeDefinitions:
+          - AttributeName: emailId
+            AttributeType: S
+          - AttributeName: folder
+            AttributeType: S
+          - AttributeName: account
+            AttributeType: S
+          - AttributeName: clave
+            AttributeType: S
+
+        KeySchema:
+          - AttributeName: emailId
+            KeyType: HASH
+
+        GlobalSecondaryIndexes:
+          - IndexName: "accountFolder"
+            KeySchema:
+              - AttributeName: "account"
+                KeyType: "HASH"
+              - AttributeName: "folder"
+                KeyType: "RANGE"
+            Projection:
+              ProjectionType: "ALL"
+
+          - IndexName: "clave"
+            KeySchema:
+              - AttributeName: "clave"
+                KeyType: "HASH"
+            Projection:
+              ProjectionType: "ALL"
+
+        BillingMode: PAY_PER_REQUEST

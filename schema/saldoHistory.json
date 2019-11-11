@@ -1,0 +1,80 @@
+{
+  "$id": "http://example.com/example.json",
+  "type": "object",
+  "limit": 5000,
+  "maxLimit": 10000,
+  "shareLevel": 5,
+
+  "title": "Saldo Historico",
+  "key": "saldoHistory",
+  "namespace": "auditoria",
+  "properties": {
+    "id": {
+      "$id": "/properties/id",
+      "type": "integer",
+      "title": "Id",
+      "locked": true
+    },
+
+    "clienteId": {
+      "$id": "/properties/clienteId",
+      "type": "integer",
+      "title": "Cliente",
+      "table": "cliente",
+      "filterable": true,
+      "route": "cliente/findLikeName",
+      "metadataType": "cliente",
+      "width": 220,
+      "element": "autocomplete",
+      "elementOptions": {
+        "primary": "name"
+      }
+    },
+
+    "total": {
+      "$id": "/properties/total",
+      "type": "number",
+      "title": "Saldo",
+      "filterRenderer": "NumericFilter",
+      "filterable": true,
+      "sortable": true
+    },
+    "documentoId": {
+      "$id": "/properties/documentoId",
+      "type": "integer",
+      "title": "Documento Id",
+      "table": "documento",
+      "filterable": true,
+
+      "sortable": true,
+      "fields": [["consecutivo", "consecutivo"]]
+    },
+    "consecutivo": {
+      "$id": "/properties/consecutivo",
+      "type": "string",
+      "title": "Consecutivo",
+      "table": "documento",
+      "filterable": true,
+      "query": false
+    },
+    "createdAt": {
+      "$id": "/properties/createdAt",
+      "type": "string",
+      "title": "Creado",
+      "filterable": true,
+      "sortable": true,
+      "filterRenderer": "DateTimeFilter",
+      "width": 150
+    }
+  },
+  "actions": [],
+  "belongsTo": ["cliente", "documento"],
+  "view": {
+    "fields": ["id", "clienteId", "documentoId", "consecutivo", "total", "createdAt"]
+  },
+  "layout": [],
+  "table": {
+    "sum": ["total"],
+    "fields": ["id", "createdAt", "clienteId", "documentoId", "consecutivo", "total"]
+  }
+}

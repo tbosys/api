@@ -1,0 +1,64 @@
+
+exports.seed = async function (knex, Promise) {
+  if (process.env.NODE_ENV == "testing" || process.env.NODE_ENV == "staging" || process.env.NODE_ENV == "production") return;
+
+  await knex("transporte").insert(transporte);
+  console.log("a")
+
+  await knex("firmaDigital").insert(firmaDigital("seed"));
+  console.log("a1")
+  await knex("distrito").insert(distritos("seed"));
+  console.log("a3")
+  await knex("usuario").insert(usuarios);
+  console.log("a5")
+  await knex("vendedor").insert(vendedor);
+  console.log("a5")
+  await knex("proveedor").insert(proveedores);
+  console.log("a9")
+  
+
+  await knex("grupo").insert(grupos);
+  console.log("a91")
+  await knex("zona").insert(zonas);
+  console.log("a92")
+  await knex("segmento").insert(segmentos);
+  console.log("a94")
+  await knex("categoria").insert(categorias);
+  console.log("a96")
+
+  await knex("cliente").insert(clientes);
+  console.log("a97")
+  await knex("producto").insert(productos);
+  console.log("a91")
+  await knex("costoHistorico").insert(costoHistorico);
+  console.log("a9a")
+  await knex("producto").update({ costoHistoricoId: 1 }).where("id", 1);
+  console.log("a93")
+  await knex("producto").update({ costoHistoricoId: 2 }).where("id", 2);
+  console.log("a95")
+  await knex("producto").update({ costoHistoricoId: 3 }).where("id", 3);
+  console.log("a96")
+  await knex("producto").update({ costoHistoricoId: 4 }).where("id", 4);
+  console.log("a98")
+  await knex("producto").update({ costoHistoricoId: 5 }).where("id", 5);
+  console.log("a99")
+
+  await knex("descuentoCliente").insert(descuentoCliente);
+  console.log("a911")
+  await knex("descuentoGrupo").insert(descuentoGrupo);
+  console.log("a9122")
+  await knex("promocion").insert(promocion);
+  console.log("a9555")
+  await knex("descuentoPromocion").insert(descuentoPromocion);
+  console.log("a9555")
+  await knex("precio").insert(precios());
+  console.log("a999")
+  await knex("orden").insert(orden());
+  console.log("a9123")
+  await knex("ordenLinea").insert(ordenLinea());
+  console.log("a9099")
+
+
+
+  return true;
+};

@@ -1,0 +1,84 @@
+{
+  "$id": "http://example.com/example.json",
+  "type": "object",
+  "title": "Cliente Correo Fe",
+  "namespace": "venta",
+  "key": "clienteCorreoFe",
+  "restricted": [],
+  "properties": {
+    "id": {
+      "$id": "/properties/id",
+      "type": "integer",
+      "title": "Id"
+    },
+    "email": {
+      "$id": "/properties/email",
+      "type": "boolean",
+      "title": "Activo",
+      "formatter": "BooleanFormatter",
+      "default": true
+    },
+    "createdBy": {
+      "$id": "/properties/createdBy",
+      "type": "string",
+      "title": "Creado por"
+    },
+    "updatedBy": {
+      "$id": "/properties/updatedBy",
+      "type": "string",
+      "title": "Actualizado por"
+    },
+    "createdAt": {
+      "$id": "/properties/createdAt",
+      "type": "string",
+      "title": "Creado"
+    },
+    "updatedAt": {
+      "$id": "/properties/updatedAt",
+      "type": "string",
+      "title": "Actualizado"
+    },
+    "clienteId": {
+      "$id": "/properties/clienteId",
+      "type": "integer",
+      "title": "Cliente",
+      "table": "cliente",
+      "filterable": true,
+      "route": "cliente/findLikeName",
+      "metadataType": "cliente",
+      "element": "autocomplete",
+      "elementOptions": {
+        "primary": "name"
+      }
+    }
+  },
+  "required": [
+    "clienteId",
+    "email"
+  ],
+  "belongsTo": [
+    "cliente"
+  ],
+  "actions": [
+    "Crear",
+    "Editar"
+  ],
+  "layout": [
+    {
+      "title": "Información",
+      "cols": 4,
+      "fields": [
+        "clienteId",
+        "email"
+      ]
+    }
+  ],
+  "table": {
+    "sum": [],
+    "fields": [
+      "clienteId",
+      "activo",
+      "email"
+    ]
+  }
+}

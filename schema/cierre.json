@@ -1,0 +1,59 @@
+{
+    "$id": "http://example.com/example.json",
+    "type": "object",
+    "restricted": [],
+    "properties": {
+      "id": {
+        "$id": "/properties/id",
+        "type": "integer",
+        "title": "Id"
+      },
+      "data": {
+        "$id": "/properties/data",
+        "type": "string",
+        "title": "Nombre"
+      },
+      "tipo": {
+        "$id": "/properties/tipo",
+        "type": "string",
+        "title": "tipo"
+      },
+      "ownerId": {
+        "$id": "/properties/ownerId",
+        "type": "integer",
+        "title": "Propietario"
+      },
+      "ownerName": {
+        "$id": "/properties/ownerName",
+        "type": "string",
+        "title": "Nombre Propietario"
+      },
+      "createdBy": {
+        "$id": "/properties/createdBy",
+        "type": "string",
+        "title": "Creado por"
+      },
+      "updatedBy": {
+        "$id": "/properties/updatedBy",
+        "type": "string",
+        "title": "Actualizado por"
+      },
+      "createdAt": {
+        "$id": "/properties/createdAt",
+        "type": "string",
+        "title": "Creado"
+      },
+      "updatedAt": {
+        "$id": "/properties/updatedAt",
+        "type": "string",
+        "title": "Actualizado"
+      }
+    },
+    "required": [
+      "data",
+      "tipo"
+    ],
+    "layout":[
+      {"title":"Información", "fields": ["data"]}
+    ]
+  }

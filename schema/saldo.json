@@ -1,0 +1,357 @@
+{
+  "$id": "http://example.com/example.json",
+  "type": "object",
+  "limit": 5000,
+  "maxLimit": 10000,
+  "shareLevel": 5,
+
+  "title": "Saldo de Credito",
+  "key": "saldo",
+  "namespace": "credito",
+  "properties": {
+    "id": {
+      "$id": "/properties/id",
+      "type": "integer",
+      "title": "Id",
+      "locked": true
+    },
+    "estado": {
+      "$id": "/properties/estado",
+      "type": "string",
+      "title": "Estado",
+      "filterable": true,
+      "filterRenderer": "SelectFilter",
+      "enum": ["por vencer", "por cobrar", "por recuperar", "archivado"]
+    },
+    "tipo": {
+      "$id": "/properties/tipo",
+      "type": "string",
+      "title": "Tipo",
+      "element": "select",
+      "default": "NC",
+      "filterable": true,
+      "filterRenderer": "SelectFilter",
+      "enum": ["FA", "ND", "NC"]
+    },
+    "consecutivo": {
+      "$id": "/properties/consecutivo",
+      "type": "string",
+      "title": "Consecutivo",
+      "filterable": true,
+      "sortable": true
+    },
+    "plazo": {
+      "$id": "/properties/plazo",
+      "type": "integer",
+      "title": "Plazo",
+      "filterable": true,
+      "sortable": true,
+      "filterRenderer": "NumericFilter"
+    },
+    "plazoActual": {
+      "$id": "/properties/plazoActual",
+      "type": "integer",
+      "title": "plazoActual",
+      "select": "DATEDIFF(NOW(),saldo.fecha)",
+      "filterComparator": "=",
+      "calculated": true,
+      "sortable": true,
+      "filterRenderer": "NumericFilter",
+      "filterable": true
+    },
+    "fechaVencimiento": {
+      "$id": "/properties/plazoActual",
+      "type": "integer",
+      "title": "Vence",
+      "select": "DATE_ADD(documento.fecha, INTERVAL documento.plazo DAY)",
+      "filterComparator": "=",
+      "calculated": true,
+      "sortable": true,
+      "filterRenderer": "NumericFilter",
+      "filterable": true
+    },
+
+    "plazoVencido": {
+      "$id": "/properties/plazoAgrupado",
+      "type": "integer",
+      "calculated": true,
+      "title": "Plazo Vencido",
+      "select": "DATEDIFF(NOW(),DATE_ADD(documento.fecha, INTERVAL documento.plazo DAY) )",
+      "filterable": true,
+      "filterComparator": "=",
+      "sortable": true
+    },
+
+    "plazoVencidoAgrupado": {
+      "$id": "/properties/plazoAgrupado",
+      "type": "string",
+      "filterRenderer": "SelectFilter",
+      "calculated": true,
+      "title": "Vencido",
+      "select": "(case when DATEDIFF(NOW(),DATE_ADD(documento.fecha, INTERVAL documento.plazo DAY) ) <= 15  then '0-15' when DATEDIFF(NOW(),DATE_ADD(documento.fecha, INTERVAL documento.plazo DAY) ) > 15 and DATEDIFF(NOW(),DATE_ADD(documento.fecha, INTERVAL documento.plazo DAY) ) < 30  then '15-30'  when DATEDIFF(NOW(),DATE_ADD(documento.fecha, INTERVAL documento.plazo DAY) ) >= 30 and DATEDIFF(NOW(),DATE_ADD(documento.fecha, INTERVAL documento.plazo DAY) ) < 45  then '30-45' when DATEDIFF(NOW(),DATE_ADD(documento.fecha, INTERVAL documento.plazo DAY) ) >= 45 and DATEDIFF(NOW(),DATE_ADD(documento.fecha, INTERVAL documento.plazo DAY) ) < 60  then '45-60' else '60+' end)",
+      "filterable": true,
+      "filterComparator": "=",
+      "sortable": true,
+      "enum": ["0", "15-30", "30-45", "45-60", "60+"]
+    },
+
+    "plazoAgrupado": {
+      "$id": "/properties/plazoAgrupado",
+      "type": "string",
+      "filterRenderer": "SelectFilter",
+      "calculated": true,
+      "title": "Agrupado",
+      "select": "(case when DATEDIFF(NOW(),saldo.fecha) >= 0 and DATEDIFF(NOW(),saldo.fecha) < 30  then '0-30' when DATEDIFF(NOW(),saldo.fecha) >= 30 and DATEDIFF(NOW(),saldo.fecha) < 45  then '30-45'  when DATEDIFF(NOW(),saldo.fecha) >= 45 and DATEDIFF(NOW(),saldo.fecha) < 60  then '45-60' when DATEDIFF(NOW(),saldo.fecha) >= 60 and DATEDIFF(NOW(),saldo.fecha) < 90  then '60-90' else '90+' end)",
+      "filterable": true,
+      "filterComparator": "=",
+      "sortable": true,
+      "enum": ["0-30", "30-45", "45-60", "60-90", "90+"]
+    },
+    "total": {
+      "$id": "/properties/total",
+      "type": "number",
+      "title": "Saldo",
+      "filterRenderer": "NumericFilter",
+      "filterable": true,
+      "sortable": true
+    },
+    "activo": {
+      "$id": "/properties/total",
+      "type": "boolean",
+      "default": true,
+      "sortable": true,
+      "filterable": true,
+      "title": "Activo"
+    },
+    "totalComprobante": {
+      "$id": "/properties/totalComprobante",
+      "type": "number",
+      "title": "Total",
+      "select": "documento.totalComprobante",
+      "sortable": true,
+      "filterRenderer": "NumericFilter",
+      "filterable": true
+    },
+    "pdf": {
+      "$id": "/properties/pdf",
+      "type": "string",
+      "title": "PDF",
+      "select": "documento.pdf",
+      "formatter": "LinkFormatter"
+    },
+    "zonaId": {
+      "$id": "/properties/zonaId",
+      "type": "string",
+      "title": "Zona",
+      "sortable": true,
+      "filterable": true,
+      "select": "zona.name",
+      "fields": [["name", "zonaId"]]
+    },
+    "clienteId": {
+      "$id": "/properties/clienteId",
+      "type": "integer",
+      "title": "Cliente",
+      "table": "cliente",
+      "filterable": true,
+      "route": "cliente/findLikeName",
+      "metadataType": "cliente",
+      "width": 240,
+      "element": "autocomplete",
+      "elementOptions": {
+        "primary": "name"
+      }
+    },
+    "creditoLimite": {
+      "$id": "/properties/creditoLimite",
+      "type": "number",
+      "title": "Limite de credito",
+      "select": "cliente.creditolimite",
+      "sortable": true,
+      "filterRenderer": "NumericFilter",
+      "filterable": true,
+      "width": 150
+    },
+    "tags": {
+      "$id": "/properties/tags",
+      "type": "string",
+      "title": "Tags",
+      "select": "cliente.tags",
+      "sortable": true,
+      "filterable": true
+    },
+    "cobroDia": {
+      "$id": "/properties/cobroDia",
+      "type": "string",
+      "title": "Dia Cobro",
+      "select": "cliente.cobroDia",
+      "sortable": true,
+      "filterable": true
+    },
+    "cobroEncargadoId": {
+      "$id": "/properties/cobroEncargadoId",
+      "type": "string",
+      "title": "Encargado Cobro",
+      "sortable": true,
+      "filterable": true,
+      "select": "cobroEncargado.name",
+      "fields": [["name", "cobroEncargadoId"]],
+      "width": 150
+    },
+    "fecha": {
+      "$id": "/properties/fecha",
+      "type": "string",
+      "title": "Fecha",
+      "filterable": true,
+      "filterRenderer": "DateFilter",
+      "sortable": true
+    },
+    "moneda": {
+      "$id": "/properties/moneda",
+      "type": "string",
+      "title": "moneda",
+      "enum": ["CRC", "USD"],
+      "filterRenderer": "SelectFilter",
+      "filterable": true,
+      "defaultTo": "CRC"
+    },
+    "history": {
+      "$id": "/properties/moneda",
+      "type": "string",
+      "title": "Historia",
+      "isJson": true,
+      "formatter": "TextFormatter",
+
+      "width": 200
+    },
+    "tipoCambio": {
+      "$id": "/properties/tipoCambio",
+      "type": "number",
+      "title": "tipoCambio"
+    },
+    "documentoId": {
+      "$id": "/properties/documentoId",
+      "type": "integer",
+      "title": "Documento",
+      "table": "documento",
+      "filterable": true,
+      "metadataType": "documento",
+      "element": "autocomplete",
+      "elementOptions": {
+        "primary": "name"
+      },
+      "sortable": true,
+      "fields": [["totalComprobante", "totalComprobante"], ["pdf", "pdf"]]
+    },
+    "ownerId": {
+      "$id": "/properties/ownerId",
+      "type": "integer",
+      "title": "Propietario",
+      "table": "owner",
+      "filterable": true,
+      "sortable": true,
+      "route": "owner/findLikeName",
+      "metadataType": "owner",
+      "element": "autocomplete",
+      "elementOptions": {
+        "primary": "name"
+      },
+      "width": 180
+    },
+    "ownerName": {
+      "$id": "/properties/ownerName",
+      "type": "string",
+      "title": "Nombre Propietario"
+    },
+    "createdBy": {
+      "$id": "/properties/createdBy",
+      "type": "string",
+      "title": "Creado por"
+    },
+    "updatedBy": {
+      "$id": "/properties/updatedBy",
+      "type": "string",
+      "title": "Actualizado por"
+    },
+    "createdAt": {
+      "$id": "/properties/createdAt",
+      "type": "string",
+      "title": "Creado"
+    },
+    "updatedAt": {
+      "$id": "/properties/updatedAt",
+      "type": "string",
+      "title": "Actualizado"
+    }
+  },
+  "actions": [
+    {
+      "title": "Pagar",
+      "type": "modal"
+    },
+    "Cancelar",
+    "Ver"
+  ],
+  "belongsTo": ["cliente", "documento", "cliente>zona", "cliente>cobroEncargado", "owner"],
+  "required": ["clienteId", "total"],
+  "view": {
+    "fields": [
+      "id",
+      "clienteId",
+      "documentoId",
+      "consecutivo",
+      "fechaVencimiento",
+      "ownerId",
+      "estado",
+      "fecha",
+      "tipo",
+      "totalComprobante",
+      "total",
+      "activo",
+      "plazoAgrupado",
+      "plazoActual",
+      "plazo",
+      "zonaId"
+    ],
+    "fullFields": ["history"]
+  },
+  "layout": [
+    {
+      "title": "Información",
+      "cols": 4,
+      "fields": ["clienteId", "tipo"]
+    },
+    {
+      "cols": 8,
+      "title": "Totales",
+      "fields": ["totalComprobante"]
+    }
+  ],
+  "table": {
+    "sum": ["total"],
+    "fields": [
+      "id",
+      "clienteId",
+      "ownerId",
+      "estado",
+      "fecha",
+      "fechaVencimiento",
+      "plazoVencidoAgrupado",
+      "consecutivo",
+      "pdf",
+      "tipo",
+      "tags",
+      "creditoLimite",
+      "totalComprobante",
+      "total",
+      "activo",
+      "plazoAgrupado",
+      "plazoActual",
+      "plazo",
+      "zonaId",
+      "history",
+      "cobroDia",
+      "cobroEncargadoId"
+    ]
+  }
+}
