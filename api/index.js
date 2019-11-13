@@ -13,7 +13,6 @@ module.exports = class Api {
       Operation = class Op extends BaseApiOperation {
         constructor(context, user, knex) {
           super(context, user, knex);
-          this.multiTenantObject = true;
           this._user = user;
           this.context = context;
           this._knex = knex;

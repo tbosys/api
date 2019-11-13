@@ -4,11 +4,10 @@ module.exports = {
   development: {
     debug: false,
     client: "mysql2",
-
     connection: {
       user: "root",
       host: "127.0.0.1",
-      database: "development",
+      database: "dev",
       password: "monomono",
       timezone: "UTC",
       typeCast: function(field, next) {

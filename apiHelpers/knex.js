@@ -7,8 +7,6 @@ var Connection = function(database) {
 
   var knexAuth = knexFile[env];
 
-  knexAuth.connection.database = database;
-
   var knex = require("knex")(knexAuth);
   if (Connection.mock && !mockDb.ready) {
     mockDb.ready = true;

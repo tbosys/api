@@ -1,6 +1,5 @@
 var BaseAction = require("./baseAction");
 var Errors = require("../errors");
-var BodyHelper = require("./bodyHelper");
 var Security = require("../apiHelpers/security");
 var moment = require("moment-timezone");
 
@@ -37,7 +36,8 @@ module.exports = class DefaultCreateAction extends BaseAction {
   }
 
   checkSecurity() {
-    if (!this.securityChecked) Security.checkCreate(this.metadata, this.user, this.getDeltaFields());
+    if (!this.securityChecked)
+      Security.checkCreate(this.metadata, this.user, this.getDeltaFields());
   }
 
   getDeltaFields() {
@@ -55,11 +55,18 @@ module.exports = class DefaultCreateAction extends BaseAction {
   }
 
   setDefaultValues() {
-    if (this.metadata.properties.namespaceId) this.body.namespaceId = process.env.NODE_ENV;
-    if (this.metadata.properties.createdBy) this.body.createdBy = this.user.name;
-    if (!this.body.ownerId && this.metadata.properties.ownerId) this.body.ownerId = this.user.id;
-    if (this.metadata.properties.updatedAt) this.body.updatedAt = moment().format("YYYY-MM-DD HH:mm:ss");
-    if (this.metadata.properties.ownerName && this.context.userMap[this.body.ownerId])
+    if (this.metadata.properties.namespaceId)
+      this.body.namespaceId = process.env.NODE_ENV;
+    if (this.metadata.properties.createdBy)
+      this.body.createdBy = this.user.name;
+    if (!this.body.ownerId && this.metadata.properties.ownerId)
+      this.body.ownerId = this.user.id;
+    if (this.metadata.properties.updatedAt)
+      this.body.updatedAt = moment().format("YYYY-MM-DD HH:mm:ss");
+    if (
+      this.metadata.properties.ownerName &&
+      this.context.userMap[this.body.ownerId]
+    )
       this.body.ownerName = this.context.userMap[this.body.ownerId].name;
   }
 
@@ -92,7 +99,8 @@ module.exports = class DefaultCreateAction extends BaseAction {
 
       return this.results;
     } catch (e) {
-      if (e.code == "ER_DUP_ENTRY") throw new Errors.DUPLICATE_ERROR(e, this.body);
+      if (e.code == "ER_DUP_ENTRY")
+        throw new Errors.DUPLICATE_ERROR(e, this.body);
       throw e;
     }
   }

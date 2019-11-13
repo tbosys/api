@@ -37,111 +37,53 @@ class UserModel {
     this.check = this.check.bind(this);
   }
 
-  async getProfiles(account) {
-    return await this.context.DynamoDB.table(process.env.NODE_ENV + "Profile")
-      .select("id", "name", "roles")
-      .where("account")
-      .eq(account)
-      .descending()
-      .query();
-  }
-
-  async getUsers(account) {
-    let profiles = await this.getProfiles(account);
-    let users = await this.context.DynamoDB.table(process.env.NODE_ENV + "Usuario")
+  async getUserData(ownerId) {
+    let users = await this.context.knex
+      .table("owner")
       .select(
-        "email",
-        "id",
-        "roles",
-        "profiles",
-        "avatar",
-        "roles_off",
-        "name",
-        "account",
-        "profile",
-        "activo",
-        "nivel",
-        "comisiona"
+        "owner.email",
+        "owner.id",
+        "owner.avatar",
+        "owner.name",
+        "owner.active",
+        "owner.shareLevel"
       )
-      .where("account")
-      .eq(account)
-      .descending()
-      .query();
+      .where("active", true);
 
-    var profileMap = {};
-    profiles.forEach(profile => {
-      if (profile.roles) profileMap[profile.name] = profile.roles.split(",");
-    });
+    //This soft limit is in place, if it's ever triggered consider changes to the authentication and user architecture. Hard limnit should be 500 users.
+    if (users.length > 100)
+      throw new errors.AUTH_ERROR(
+        "You have reached a soft user limit. Ask your team to comment line 56 of the auth middleware"
+      );
 
-    users.forEach(user => {
-      if (!user.profiles) user.profiles = "";
-      if (!user.roles) user.roles = "";
-      if (!user.roles_off) user.roles_off = "";
-      user.roles = user.roles.split(",");
-      user.profiles = user.profiles.split(",");
-      user.roles_off = user.roles_off.split(",");
+    const lineProfiles = await this.context.knex
+      .table("profile")
+      .select("profile.id", "profile.roles", "profile.name")
+      .innerJoin("profileOwner", "profileOwner.profileId", "profile.id")
+      .where({ "profileOwner.ownerId": ownerId });
 
-      user.profiles.forEach(profile => {
-        var profileRoles = profileMap[profile];
-        if (profileRoles) user.roles = user.roles.concat(profileRoles);
-      });
-      user.roles.forEach((rol, index) => {
-        if (user.roles_off.indexOf(rol) > -1) user.roles.splice(index, 1);
-      });
-      user.roles = user.roles.join(",");
-    });
+    const user = users.filter(item => {
+      return item.id == ownerId;
+    })[0];
+    user.roles = lineProfiles.map(item => item.roles);
 
-    return users;
-  }
-
-  async getDbUser(users, user, returnSystem) {
-    var foundUser = users.filter(loopUser => {
-      if (returnSystem && loopUser.name == "Sistema") return true;
-      if (user.id == loopUser.id) return true;
-      return false;
-    });
-
-    //console.log(foundUser);
-    if (!foundUser[0] || foundUser[0].activo === false || foundUser[0].activo === 0)
-      throw new errors.AUTH_ERROR("El usuario no esta activo.");
-    return foundUser[0];
+    return { users, user };
   }
 
   async check(headers) {
-    var user;
-    var dbUser;
-    var account = headers["x-account"];
-    let users = await this.getUsers(account);
+    if (headers["authorization"]) {
+      var userToken = JWT.decode(headers["authorization"]);
+      const { user, users } = await this.getUserData(userToken.id);
+      if (!user) throw new errors.AUTH_ERROR("Expired Token, login again");
+      if (!userToken.timestamp || !moment().isSame(userToken.timestamp, "day"))
+        throw new errors.AUTH_ERROR("Expired Token, login again");
 
-    if (headers["x-authorization"]) {
-      user = JWT.decode(headers["x-authorization"]);
-
-      dbUser = await this.getDbUser(users, user);
-
-      if (!user.timestamp || !moment().isSame(user.timestamp, "day"))
-        throw new errors.AUTH_ERROR("Token Vencido, login de nuevo");
-
-      user.roles = dbUser.roles;
-      user.nivel = dbUser.nivel;
-      user.account = dbUser.account;
-
-      if (user.account != account) throw new errors.AUTH_ERROR("Account mismatch");
-      user.account = headers["x-account"];
-    } else if (headers["x-token"]) {
-      //console.log("using x-token");
-      user = JWT.decode(headers["x-token"]);
-
-      dbUser = await this.getDbUser(users, user, true);
-      user.roles = dbUser.roles;
-      user.nivel = dbUser.nivel;
-      user.account = dbUser.account;
-      if (user.account != account) throw new errors.AUTH_ERROR("Account mismatch");
+      const usersMap = users.reduce(function(map, obj) {
+        map[obj.id] = obj.val;
+        return map;
+      }, {});
+      return { user, users, usersMap };
     }
-
-    var userMap = {};
-    users.forEach(user => {
-      userMap[user.id + ""] = user;
-    });
-    return { user: dbUser, users: users, usersMap: userMap };
+    return {};
   }
 }

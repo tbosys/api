@@ -8,7 +8,8 @@ const middy = require("middy");
 
 const EventMiddleware = require("./middleware/event");
 const ErrorMiddleware = require("./middleware/error");
-const DynamoMiddleware = require("./middleware/dynamo");
+//const DynamoMiddleware = require("./middleware/dynamo");
+const ConfigMiddleware = require("./middleware/config");
 const KnexMiddleware = require("./middleware/knex");
 const AuthMiddleware = require("./middleware/auth");
 const AuditMiddleware = require("./middleware/audit");
@@ -26,9 +27,10 @@ Handler.use(ErrorMiddleware())
   .use(AuditMiddleware())
   .use(ResponseMiddleware())
   .use(EventMiddleware())
-  .use(DynamoMiddleware())
+  //.use(DynamoMiddleware())
   .use(KnexMiddleware())
   .use(AuthMiddleware())
+  .use(ConfigMiddleware())
   .use(ActionMiddleware());
 
 module.exports = {

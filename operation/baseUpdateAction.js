@@ -2,13 +2,11 @@ var BaseAction = require("./baseAction");
 var Errors = require("../errors");
 var moment = require("moment-timezone");
 var Security = require("../apiHelpers/security");
-var Pusher = require("../apiHelpers/pusher");
 
 module.exports = class DefaultUpdateAction extends BaseAction {
   async execute(table, body, current) {
     this.table = table;
     this.body = body;
-    console.log(body);
     if (!body.id)
       throw new Errors.VALIDATION_ERROR(
         `El API request debe tener el id y no lo tiene. ${this.table} ${body.id}`
@@ -20,7 +18,9 @@ module.exports = class DefaultUpdateAction extends BaseAction {
       .where("id", this.body.id)
       .first();
     if (!this.current || !this.current.id)
-      throw new Errors.VALIDATION_ERROR("No se encontro una fila con ese id: " + this.body.id);
+      throw new Errors.VALIDATION_ERROR(
+        "No se encontro una fila con ese id: " + this.body.id
+      );
 
     this.metadata = this.getMetadata(this.table);
     return this.update();
@@ -31,7 +31,8 @@ module.exports = class DefaultUpdateAction extends BaseAction {
   }
 
   checkSecurity() {
-    if (!this.securityChecked) Security.checkUpdate(this.metadata, this.user, this.getDeltaFields());
+    if (!this.securityChecked)
+      Security.checkUpdate(this.metadata, this.user, this.getDeltaFields());
   }
 
   getDeltaFields() {
@@ -46,10 +47,9 @@ module.exports = class DefaultUpdateAction extends BaseAction {
 
   preTransform() {
     this.json = {};
-    var keys;
     var columnKeys = Object.keys(this.metadata.properties);
 
-    keys = Object.keys(this.body);
+    var keys = Object.keys(this.body);
 
     columnKeys.forEach(columnKey => {
       if (this.metadata.properties[columnKey].isJSON) {
@@ -57,6 +57,9 @@ module.exports = class DefaultUpdateAction extends BaseAction {
           this.json[columnKey] = this.body[columnKey];
           this.body[columnKey] = JSON.stringify(this.body[columnKey]);
         }
+      }
+      if (this.metadata.properties[columnKey].type == "boolean") {
+        this.body[columnKey] = Boolean(this.body[columnKey]);
       }
     });
   }
@@ -85,9 +88,7 @@ module.exports = class DefaultUpdateAction extends BaseAction {
 
       if (this.current && this.current.estado == "archivado")
         throw new Errors.VALIDATION_ERROR(
-          `La fila ${this.current.id} seleccionada en ${
-            this.metadata.key
-          } ya esta archivada, no se puede modificar.`
+          `La fila ${this.current.id} seleccionada en ${this.metadata.key} ya esta archivada, no se puede modificar.`
         );
 
       this.preTransform();
@@ -96,8 +97,10 @@ module.exports = class DefaultUpdateAction extends BaseAction {
       await this.preUpdate();
 
       var simpleBody = { ...this.body };
-      if (this.metadata.properties.updatedAt) simpleBody.updatedAt = moment().format("YYYY-MM-DD HH:mm:ss");
-      if (this.metadata.properties.updatedBy) simpleBody.updatedBy = this.user.name;
+      if (this.metadata.properties.updatedAt)
+        simpleBody.updatedAt = moment().format("YYYY-MM-DD HH:mm:ss");
+      if (this.metadata.properties.updatedBy)
+        simpleBody.updatedBy = this.user.name;
       delete simpleBody.id;
       var where = { id: this.body.id };
 
@@ -112,7 +115,8 @@ module.exports = class DefaultUpdateAction extends BaseAction {
         .update(simpleBody)
         .where(where);
 
-      if (this.result.length == 0) throw new Errors.UPDATE_WITHOUT_RESULT(this.table, this.body.id);
+      if (this.result.length == 0)
+        throw new Errors.UPDATE_WITHOUT_RESULT(this.table, this.body.id);
 
       await this.saveAudit(this.body.id, "update", simpleBody);
 
@@ -141,11 +145,10 @@ module.exports = class DefaultUpdateAction extends BaseAction {
         }
       });
 
-      await Pusher(this.table, "general", final);
-
       return this.result;
     } catch (e) {
-      if (e.code == "ER_DUP_ENTRY") throw new Errors.DUPLICATE_ERROR(e, this.body);
+      if (e.code == "ER_DUP_ENTRY")
+        throw new Errors.DUPLICATE_ERROR(e, this.body);
       throw e;
     }
   }

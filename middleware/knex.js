@@ -15,7 +15,7 @@ module.exports = opts => {
     before: (handler, next) => {
       var Knex = require("../apiHelpers/knex");
 
-      handler.context.knex = Knex(handler.context.account);
+      handler.context.knex = Knex();
 
       next();
     }

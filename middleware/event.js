@@ -39,25 +39,26 @@ module.exports = opts => {
         handler.context.headers.ip = event.requestContext.identity.sourceIp;
       }
 
-      var account = event.headers["x-account"];
-      if (event.queryStringParameters && event.queryStringParameters.account && !account)
-        account = event.queryStringParameters.account;
-      handler.context.account = account;
-      if (!account) throw new errors.AUTH_ERROR("No tiene cuenta en el header.");
-
       handler.context.parts = RequireHelper.getParts(event.path);
 
       try {
-        if (event.body && event.body.length > 1 && typeof event.body == "string")
+        if (
+          event.body &&
+          event.body.length > 1 &&
+          typeof event.body == "string"
+        )
           event.body = JSON.parse(event.body);
       } catch (e) {}
 
-      const body = Object.assign(event.body || {}, event.queryStringParameters || {}, {});
+      const body = Object.assign(
+        event.body || {},
+        event.queryStringParameters || {},
+        {}
+      );
       //console.log("payload", JSON.stringify(body));
       event.payload = body;
       handler.event = event;
 
-      console.log("ACCOUNT", account);
       console.log("PAYLOAD", JSON.stringify(event.payload, null, 4));
 
       next();

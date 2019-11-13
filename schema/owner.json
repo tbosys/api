@@ -3,24 +3,28 @@
   "type": "object",
   "title": "Owner",
   "key": "owner",
-  "secure": false,
   "restricted": [],
   "properties": {
     "id": {
       "$id": "/properties/id",
       "type": "integer",
-      "title": "Id"
-    },
-    "comisiona": {
-      "$id": "/properties/comisiona",
-      "type": "boolean",
-      "title": "Comisiona"
+      "default": 0
     },
     "name": {
       "$id": "/properties/name",
       "type": "string",
-      "title": "Nombre",
       "default": ""
+    },
+    "email": {
+      "$id": "/properties/email",
+      "type": "string",
+      "default": ""
+    },
+    "active": {
+      "$id": "/properties/active",
+      "type": "boolean",
+      "default": true
     }
-  }
+  },
+  "required": ["name", "active"]
 }
