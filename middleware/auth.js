@@ -65,6 +65,7 @@ class UserModel {
     const user = users.filter(item => {
       return item.id == ownerId;
     })[0];
+
     user.roles = lineProfiles.map(item => item.roles);
 
     return { users, user };

@@ -6,12 +6,24 @@ function insertIgnore(knex, operation) {
 }
 
 exports.seed = async function(knex, Promise) {
-  if (process.env.NODE_ENV == "development")
+  if (process.env.NODE_ENV == "development") {
     await insertIgnore(
       knex,
       knex("owner").insert({ id: 100, email: "dev@dev", name: "Dev Dev" })
     );
-  else
+    await insertIgnore(
+      knex,
+      knex("profile").insert({
+        id: 100,
+        roles: "*_*",
+        name: "admin"
+      })
+    );
+    await insertIgnore(
+      knex,
+      knex("profileOwner").insert({ id: 100, profileId: 100, ownerId: 100 })
+    );
+  } else
     await insertIgnore(
       knex,
       knex("owner").insert({ id: 1, email: "", name: "System Account" })

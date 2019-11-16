@@ -1,0 +1,25 @@
+{
+  "$id": "http://example.com/example.json",
+  "type": "object",
+  "title": "Rol",
+  "key": "rol",
+  "restricted": [],
+  "properties": {
+    "id": {
+      "$id": "/properties/id",
+      "type": "integer",
+      "default": 0
+    },
+    "table": {
+      "$id": "/properties/table",
+      "type": "string",
+      "default": ""
+    },
+    "actions": {
+      "$id": "/properties/actions",
+      "type": "string",
+      "default": ""
+    }
+  },
+  "required": ["table"]
+}

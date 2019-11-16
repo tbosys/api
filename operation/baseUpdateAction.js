@@ -58,7 +58,10 @@ module.exports = class DefaultUpdateAction extends BaseAction {
           this.body[columnKey] = JSON.stringify(this.body[columnKey]);
         }
       }
-      if (this.metadata.properties[columnKey].type == "boolean") {
+      if (
+        this.metadata.properties[columnKey].type == "boolean" &&
+        this.body[columnKey] != null
+      ) {
         this.body[columnKey] = Boolean(this.body[columnKey]);
       }
     });
@@ -101,7 +104,7 @@ module.exports = class DefaultUpdateAction extends BaseAction {
         simpleBody.updatedAt = moment().format("YYYY-MM-DD HH:mm:ss");
       if (this.metadata.properties.updatedBy)
         simpleBody.updatedBy = this.user.name;
-      delete simpleBody.id;
+
       var where = { id: this.body.id };
 
       if (this.metadata.properties.updatedAt && this._.forceUpdate != true) {

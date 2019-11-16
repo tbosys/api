@@ -7,18 +7,19 @@
   "properties": {
     "id": {
       "$id": "/properties/id",
-      "type": "integer",
-      "default": 0
+      "type": "integer"
     },
     "name": {
       "$id": "/properties/name",
       "type": "string",
-      "default": ""
+      "default": "",
+      "minLength": 2
     },
     "email": {
       "$id": "/properties/email",
       "type": "string",
-      "default": ""
+      "default": "",
+      "minLength": 3
     },
     "active": {
       "$id": "/properties/active",
@@ -26,5 +27,6 @@
       "default": true
     }
   },
-  "required": ["name", "active"]
+  "belongsInMany": ["profileOwner"],
+  "required": ["name", "email", "active"]
 }
