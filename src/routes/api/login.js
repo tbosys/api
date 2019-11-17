@@ -1,9 +1,9 @@
-const Errors = require("../errors");
+const Errors = rootRequire("@tbos/api/errors");
 var moment = require("moment");
-let JWT = require("../apiHelpers/jwt");
+let JWT = rootRequire("@tbos/api/apiHelpers/jwt");
 var AWS = require("aws-sdk");
 var request = require("superagent");
-var BaseOperation = require("../operation/baseOperation");
+var BaseOperation = rootRequire("@tbos/api/operation/baseOperation");
 var lambda = new AWS.Lambda();
 
 class ApiOperation extends BaseOperation {

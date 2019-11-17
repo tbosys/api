@@ -15,9 +15,7 @@ module.exports = opts => {
       var user = context.user || { id: "*" };
 
       var logError = {
-        apiStatusOperationMethodUserId: `${context.functionName}_/_${status}_/_${parts.operationName}_/_${
-          parts.methodName
-        }_/_${user.id}`,
+        apiStatusOperationMethodUserId: `${context.functionName}_/_${status}_/_${parts.operationName}_/_${parts.methodName}_/_${user.id}`,
         type: "ERROR",
         error: handler.error,
         stack: handler.error.stack,
@@ -29,10 +27,10 @@ module.exports = opts => {
         status: status,
         operation: parts.operationName,
         method: parts.methodName,
-        referer: context.headers.referer,
-        origin: context.headers.origin,
+        //referer: context.headers.referer,
+        //origin: context.headers.origin,
         userAgent: handler.context.userAgent,
-        ip: context.headers.ip,
+        //ip: context.headers.ip,
         awsRequestId: context.awsRequestId,
         logGroupName: context.logGroupName,
         logStreamName: context.logStreamName
@@ -43,7 +41,11 @@ module.exports = opts => {
       if (!handler.error.status || handler.error.status > 499) {
         handler.response = {
           statusCode: handler.error.status || 500,
-          body: JSON.stringify(new errors.SERVER_ERROR(handler.error.message + " " + handler.error.stack)),
+          body: JSON.stringify(
+            new errors.SERVER_ERROR(
+              handler.error.message + " " + handler.error.stack
+            )
+          ),
           headers: {
             "Content-Type": "application/json"
           }

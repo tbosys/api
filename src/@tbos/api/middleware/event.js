@@ -8,8 +8,6 @@ module.exports = opts => {
 
   return {
     before: (handler, next) => {
-      var RequireHelper = require("../apiHelpers/require");
-
       let { event } = handler;
       //console.log("event ", JSON.stringify(event));
       Object.keys(event.headers || []).forEach(headerKey => {
@@ -39,7 +37,7 @@ module.exports = opts => {
         handler.context.headers.ip = event.requestContext.identity.sourceIp;
       }
 
-      handler.context.parts = RequireHelper.getParts(event.path);
+      handler.context.parts = getParts(event.path);
 
       try {
         if (
@@ -67,3 +65,22 @@ module.exports = opts => {
     onError: null
   };
 };
+
+function getParts(path) {
+  var parts = path.split("/"); //Parts of the URL
+  var last = -1;
+  if (
+    !parts[parts.length + last] ||
+    parts[parts.length + last] == "/" ||
+    parts[parts.length + last].length == 0
+  )
+    last--;
+
+  var method = parts[parts.length + last];
+  var operation = parts[parts.length + last - 1];
+
+  return {
+    methodName: method,
+    operationName: operation
+  };
+}

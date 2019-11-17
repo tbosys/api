@@ -12,11 +12,13 @@ class Action {
     this.user = user;
     this.knex = knex;
     if (schemaOverwrite) {
-      if (schemaOverwrite == true || schemaOverwrite == false) this.schemaOverwrite = schemaOverwrite;
+      if (schemaOverwrite == true || schemaOverwrite == false)
+        this.schemaOverwrite = schemaOverwrite;
       else context = schemaOverwrite;
     }
     this.context = context;
-    if (!this.context) throw new Errors.SERVER_ERROR("Se intenta crear un action sin context");
+    if (!this.context)
+      throw new Errors.SERVER_ERROR("Se intenta crear un action sin context");
   }
 
   get Errors() {
@@ -60,9 +62,12 @@ class Action {
 
     var ajv = new Ajv({ allErrors: true });
     try {
-      var schema = this.schemaOverwrite || require("../schema/" + schemaName);
+      var schema = this.schemaOverwrite || requireSchema("schemaName");
       if (requireFields == false) delete schema.required;
-      if (typeof requireFields == "string" && schema.required.indexOf(requireFields) > -1)
+      if (
+        typeof requireFields == "string" &&
+        schema.required.indexOf(requireFields) > -1
+      )
         schema.required = [requireFields];
     } catch (e) {
       return;
@@ -72,9 +77,12 @@ class Action {
     if (!valid) {
       //localize.es(Ajv.errors);
       throw new Errors.VALIDATION_ERROR(
-        `Error en ${schema.title || schema.key} ${ajv.errorsText(validate.errors, {
-          separator: "\n"
-        })}`,
+        `Error en ${schema.title || schema.key} ${ajv.errorsText(
+          validate.errors,
+          {
+            separator: "\n"
+          }
+        )}`,
         validate.errors,
         body
       );
@@ -108,8 +116,12 @@ class Action {
       Action = typeof fieldOrAction == "string" ? require(path) : fieldOrAction;
     } catch (e) {
       if (!e.code || e.code != "MODULE_NOT_FOUND") console.log(e);
-      if (!fallback) fallback = fieldOrAction.replace(/^\w/, c => c.toUpperCase());
-      Action = typeof fallback == "string" ? require(`./base${fallback}Action`) : fallback;
+      if (!fallback)
+        fallback = fieldOrAction.replace(/^\w/, c => c.toUpperCase());
+      Action =
+        typeof fallback == "string"
+          ? require(`./base${fallback}Action`)
+          : fallback;
     }
     Action.table = table;
     var actionInstance = new Action(this.user, this.knex, this.context);
@@ -119,17 +131,44 @@ class Action {
   }
 
   getActionAndInvoke(table, fieldOrAction, body, securityChecked) {
-    if (Action.GetActionAndInvoke) return Action.GetActionAndInvoke(table, fieldOrAction, body); //For tests
-    var action = this.getActionInstanceFor(table, fieldOrAction, securityChecked);
+    if (Action.GetActionAndInvoke)
+      return Action.GetActionAndInvoke(table, fieldOrAction, body); //For tests
+    var action = this.getActionInstanceFor(
+      table,
+      fieldOrAction,
+      securityChecked
+    );
     if (!action.securityChecked)
-      Security.checkAction(this.table, this.user, { secure: true }, fieldOrAction, action);
+      Security.checkAction(
+        this.table,
+        this.user,
+        { secure: true },
+        fieldOrAction,
+        action
+      );
 
     return action.execute(table, body);
   }
 
-  createRegistro(metadataId, field, departamento, monto, metadata, categoria, tipoPlazo) {
+  createRegistro(
+    metadataId,
+    field,
+    departamento,
+    monto,
+    metadata,
+    categoria,
+    tipoPlazo
+  ) {
     if (Action.CreateRegistro)
-      return Action.CreateRegistro(metadataId, field, departamento, monto, metadata, categoria, tipoPlazo);
+      return Action.CreateRegistro(
+        metadataId,
+        field,
+        departamento,
+        monto,
+        metadata,
+        categoria,
+        tipoPlazo
+      );
 
     var registro = {
       metadataId: metadataId,
@@ -145,7 +184,8 @@ class Action {
       fecha: moment().format("YYYY-MM-DD"),
       namespaceId: process.env.NODE_ENV
     };
-    if (!registro.metadataType) throw new Error("Registro no puede obtener tipo, revise el JSON Schema");
+    if (!registro.metadataType)
+      throw new Error("Registro no puede obtener tipo, revise el JSON Schema");
     return this.knex.table("registro").insert(registro);
   }
 
@@ -153,7 +193,7 @@ class Action {
     var dirParts = __dirname.split("/");
     if (!table) table = Action.table || this.table; //dirParts[dirParts.length - 1];
     try {
-      this._metadata = require("../schema/" + table + ".json");
+      this._metadata = requireSchema(table + ".json");
       return this._metadata;
     } catch (e) {
       console.log(e);
@@ -163,7 +203,9 @@ class Action {
 
   enforceSingleId(body) {
     if (!body.ids || body.ids.length == 0)
-      throw new Errors.VALIDATION_ERROR("Debe seleccionar una fila para ejecutar esta accion.");
+      throw new Errors.VALIDATION_ERROR(
+        "Debe seleccionar una fila para ejecutar esta accion."
+      );
     var id = body.ids[0];
     return id;
   }
@@ -175,12 +217,15 @@ class Action {
     if (body.ids) knexPromise = knexPromise.whereIn("id", body.ids);
     else knexPromise = knexPromise.where("id", body.ids);
 
-    if (Array.isArray(expectedEstado)) knexPromise = knexPromise.whereIn("estado", expectedEstado);
+    if (Array.isArray(expectedEstado))
+      knexPromise = knexPromise.whereIn("estado", expectedEstado);
     else knexPromise = knexPromise.where("estado", expectedEstado);
 
     var results = await knexPromise;
     if (results.length > 0)
-      throw new Errors.VALIDATION_ERROR("La fila esta en un estado que no se puede borrar");
+      throw new Errors.VALIDATION_ERROR(
+        "La fila esta en un estado que no se puede borrar"
+      );
   }
 
   async enforceStatus(body, expectedEstado) {
@@ -190,12 +235,15 @@ class Action {
     if (body.ids) knexPromise = knexPromise.whereIn("id", body.ids);
     else knexPromise = knexPromise.where("id", body.ids);
 
-    if (Array.isArray(expectedEstado)) knexPromise = knexPromise.whereIn("estado", expectedEstado);
+    if (Array.isArray(expectedEstado))
+      knexPromise = knexPromise.whereIn("estado", expectedEstado);
     else knexPromise = knexPromise.where("estado", expectedEstado);
 
     var results = await knexPromise;
     if (results.length == 0 || results.length != body.ids.length)
-      throw new Errors.VALIDATION_ERROR("El estado de una de las filas no es " + expectedEstado);
+      throw new Errors.VALIDATION_ERROR(
+        "El estado de una de las filas no es " + expectedEstado
+      );
 
     return results;
   }

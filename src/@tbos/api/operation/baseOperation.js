@@ -281,7 +281,7 @@ class ApiOperation {
 
   getExternalMetadata(key) {
     try {
-      var metadata = require("../schema/" + key + ".json");
+      var metadata = requireSchema(key + ".json");
       metadata = this.validateMetadata(this._metadata);
       return metadata;
     } catch (e) {
@@ -293,9 +293,7 @@ class ApiOperation {
   getMetadata() {
     if (this._metadata) return this._metadata;
     try {
-      this._metadata = require("../schema/" +
-        (this.schema || this.table) +
-        ".json");
+      this._metadata = requireSchema((this.schema || this.table) + ".json");
       this._metadata = this.validateMetadata(this._metadata);
       return this._metadata;
     } catch (e) {

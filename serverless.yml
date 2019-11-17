@@ -80,9 +80,8 @@ provider:
         - "*"
 
 functions:
-  
   api:
-    handler: handler.api
+    handler: src/handler.api
     timeout: 30
     memorySize: 824
     environment:

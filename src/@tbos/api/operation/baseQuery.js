@@ -30,7 +30,7 @@ class ApiOperation {
 
   getExternalMetadata(key) {
     try {
-      var metadata = require("../schema/" + key + ".json");
+      var metadata = requireSchema(key + ".json");
       metadata = this.validateMetadata(this._metadata);
       return metadata;
     } catch (e) {
@@ -42,7 +42,7 @@ class ApiOperation {
   getMetadata() {
     if (this._metadata) return this._metadata;
     try {
-      this._metadata = require("../schema/" + (this.schema || this.table) + ".json");
+      this._metadata = requireSchema((this.schema || this.table) + ".json");
       this._metadata = this.validateMetadata(this._metadata);
       return this._metadata;
     } catch (e) {
@@ -109,7 +109,8 @@ class ApiOperation {
 
       if (metadata.properties.ownerId) {
         if (metadata.shareLevel) {
-          if ((this.user.nivel || 100) >= metadata.shareLevel) return result.ownerId == this.user.id;
+          if ((this.user.nivel || 100) >= metadata.shareLevel)
+            return result.ownerId == this.user.id;
           //If owner is me, then filter true else false.
           else return true; // in case nivel user < 5 then return true
         }
@@ -120,7 +121,10 @@ class ApiOperation {
     if (body.filterOwnerName && body.filterOwnerName.length > 0) {
       items = items.filter(item => {
         var ownerName = item.__ownerId || "";
-        return ownerName.toLowerCase().indexOf(body.filterOwnerName.toLowerCase()) > -1;
+        return (
+          ownerName.toLowerCase().indexOf(body.filterOwnerName.toLowerCase()) >
+          -1
+        );
       });
     }
 
@@ -170,18 +174,27 @@ class ApiOperation {
     var results = await this._query(body, doNotCheckSecurity);
     if (!body.cursor) {
       var countQuery = await this._query(body, doNotCheckSecurity, true);
-      if (countQuery && countQuery.length > 0) body.totalCount = countQuery[0].count;
+      if (countQuery && countQuery.length > 0)
+        body.totalCount = countQuery[0].count;
       else body.totalCount = 0;
     }
 
     results = await this.postQuery(results, body);
 
-    if (results.length > 0 && metadata.restrictedQuery && metadata.restrictedQuery.length > -1) {
+    if (
+      results.length > 0 &&
+      metadata.restrictedQuery &&
+      metadata.restrictedQuery.length > -1
+    ) {
       var fields = Object.keys(results[0]);
       results = results.map(result => {
         fields.forEach(field => {
           if (metadata.restrictedQuery.indexOf(field) > -1) {
-            var restricted = Security.checkQueryField(this.table, this.user, field);
+            var restricted = Security.checkQueryField(
+              this.table,
+              this.user,
+              field
+            );
             if (restricted) delete result[field];
           }
         });
@@ -216,15 +229,20 @@ class ApiOperation {
   _query(body, doNotCheckSecurity = false, count = false) {
     var metadata = this.getMetadata();
     var isSecure = metadata.secure || true;
-    if (doNotCheckSecurity == false && isSecure) Security.checkQuery(this.table, this.user);
+    if (doNotCheckSecurity == false && isSecure)
+      Security.checkQuery(this.table, this.user);
 
     var knexOperation = this.knex(this.table);
     knexOperation = this.getSelectQuery(knexOperation, body, count);
 
     knexOperation = this.processQueryFilter(knexOperation, body);
-    if (body.id) knexOperation = knexOperation.where({ [`${this.table}.id`]: body.id });
+    if (body.id)
+      knexOperation = knexOperation.where({ [`${this.table}.id`]: body.id });
     if (body.inProgress && metadata.properties.estado)
-      knexOperation = knexOperation.whereNot(`${this.table}.estado`, "archivado");
+      knexOperation = knexOperation.whereNot(
+        `${this.table}.estado`,
+        "archivado"
+      );
 
     if (
       !body.fromOne &&
@@ -232,7 +250,10 @@ class ApiOperation {
       JSON.stringify(body.filters || "").indexOf("activo") == -1 &&
       body.source != "edit"
     )
-      knexOperation = knexOperation.where(metadata.properties.activo.select || `${this.table}.activo`, 1);
+      knexOperation = knexOperation.where(
+        metadata.properties.activo.select || `${this.table}.activo`,
+        1
+      );
 
     //TODO FIX THIS
 
@@ -241,12 +262,17 @@ class ApiOperation {
         var column = this.getMetadata().properties[key];
         var field = this.parseField(key);
         if (column.select) field = key;
-        knexOperation = knexOperation.orderBy(field, body.sort[key].toLowerCase());
+        knexOperation = knexOperation.orderBy(
+          field,
+          body.sort[key].toLowerCase()
+        );
       });
     } else knexOperation.orderBy(`${this.table}.id`, "desc");
 
-    if (body.limit && !count) knexOperation = knexOperation.limit(body.limit + 1);
-    if (body.lastId && !count) knexOperation = knexOperation.offset(body.lastId);
+    if (body.limit && !count)
+      knexOperation = knexOperation.limit(body.limit + 1);
+    if (body.lastId && !count)
+      knexOperation = knexOperation.offset(body.lastId);
 
     //console.log(knexOperation.toString());
     return knexOperation;
@@ -277,17 +303,22 @@ class ApiOperation {
       .map(field => {
         var fieldName = field.key;
         if (!fieldName && typeof field == "string") fieldName = field;
-        if (field.select) return this.knex.raw(`${field.select} as ${fieldName}`);
+        if (field.select)
+          return this.knex.raw(`${field.select} as ${fieldName}`);
         return `${this.table}.${fieldName}`;
       });
 
     function belongsToJoin(relation) {
       var parts = relation.split(">"); //cliente>zona. 1=Zona 0= Cliente
       joins.push([parts[1], `${parts[1]}.id`, `${[parts[0]]}.${parts[1]}Id`]);
-      var fieldProperties = metadata.properties[`${parts[1]}Id`] ? metadata.properties[`${parts[1]}Id`] : {};
+      var fieldProperties = metadata.properties[`${parts[1]}Id`]
+        ? metadata.properties[`${parts[1]}Id`]
+        : {};
       if (fieldProperties.fields)
         fieldProperties.fields.forEach(relatedFieldArray => {
-          parsedFields.push(`${parts[1]}.${relatedFieldArray[0]} as ${relatedFieldArray[1]}`);
+          parsedFields.push(
+            `${parts[1]}.${relatedFieldArray[0]} as ${relatedFieldArray[1]}`
+          );
         });
     }
 
@@ -298,18 +329,25 @@ class ApiOperation {
       var alias = fieldProperties.tableAlias || fieldProperties.table;
       if (fieldProperties.fields)
         fieldProperties.fields.forEach(relatedFieldArray => {
-          parsedFields.push(`${alias}.${relatedFieldArray[0]} as ${relatedFieldArray[1]}`);
+          parsedFields.push(
+            `${alias}.${relatedFieldArray[0]} as ${relatedFieldArray[1]}`
+          );
         });
       else {
         names.forEach(name => {
-          var adjustedName = name.indexOf("Id") > -1 ? `__${name}` : `__${name}Id`;
+          var adjustedName =
+            name.indexOf("Id") > -1 ? `__${name}` : `__${name}Id`;
           parsedFields.push(`${alias}.name as ${adjustedName}`);
         });
       }
       names.forEach(name => {
         var adjustedName = name.indexOf("Id") > -1 ? `${name}` : `${name}Id`;
 
-        joins.push([`${fieldProperties.table} as ${alias}`, `${alias}.id`, `${table}.${adjustedName}`]);
+        joins.push([
+          `${fieldProperties.table} as ${alias}`,
+          `${alias}.id`,
+          `${table}.${adjustedName}`
+        ]);
       });
     }
 
@@ -325,7 +363,11 @@ class ApiOperation {
 
     if (metadata.belongsIn && metadata.belongsIn.length > 0) {
       metadata.belongsIn.forEach(relation => {
-        joins.push([relation, `${relation}.${metadata.key}Id`, `${[metadata.key]}.id`]);
+        joins.push([
+          relation,
+          `${relation}.${metadata.key}Id`,
+          `${[metadata.key]}.id`
+        ]);
       });
     }
 
@@ -360,35 +402,60 @@ class ApiOperation {
         //table.propertyKey
         var parts = filterKey.split(".");
         if (!parts.length > 0)
-          throw new Errors.VALIDATION_ERROR(`Maximo dos relaciones en el query ${filter[0]}`);
+          throw new Errors.VALIDATION_ERROR(
+            `Maximo dos relaciones en el query ${filter[0]}`
+          );
         tableName = parts[0];
         filterKey = parts[1];
         var otherMetadata = this.getExternalMetadata(tableName);
         column = otherMetadata.properties[filterKey];
       }
-      if (!column) throw new Errors.VALIDATION_ERROR(`${filter[0]} no pudo ser convertido en un metadata`);
+      if (!column)
+        throw new Errors.VALIDATION_ERROR(
+          `${filter[0]} no pudo ser convertido en un metadata`
+        );
       var fullFieldName = `${tableName}.${filterKey}`;
 
       if (column && column.excludeFromQuery) return;
       else if (column && column.select && filter[1] == "LIKE")
-        knexOperation.whereRaw(`${column.select} ${filter[1]} ?`, `%${filter[2]}%`);
-      else if (column && column.select) knexOperation.whereRaw(`${column.select} ${filter[1]} ?`, filter[2]);
+        knexOperation.whereRaw(
+          `${column.select} ${filter[1]} ?`,
+          `%${filter[2]}%`
+        );
+      else if (column && column.select)
+        knexOperation.whereRaw(`${column.select} ${filter[1]} ?`, filter[2]);
       else if (column.element == "autocomplete" && filter[1] == "LIKE") {
-        var field = column.elementOptions ? column.elementOptions.primary : "name";
-        knexOperation.where(`${column.table}.${field}`, "LIKE", `%${filter[2]}%`);
+        var field = column.elementOptions
+          ? column.elementOptions.primary
+          : "name";
+        knexOperation.where(
+          `${column.table}.${field}`,
+          "LIKE",
+          `%${filter[2]}%`
+        );
       } else if (filter[1] == "IN_PROGRESS") {
         knexOperation.whereNot(`${this.table}.estado`, "archivado");
-      } else if (filter[1] == "LIKE" && filter[2] && filter[2].indexOf("%") == -1)
+      } else if (
+        filter[1] == "LIKE" &&
+        filter[2] &&
+        filter[2].indexOf("%") == -1
+      )
         knexOperation.where(fullFieldName, "LIKE", `%${filter[2]}%`);
       else if (filter[1] == "STATIC_DATE") {
         var dates = this.getFixedDates(filter[2]);
         knexOperation.whereBetween(fullFieldName, dates);
       } else if (filter[1] == "BETWEEN_DATE") {
         var format = "YYYY-MM-DD";
-        if (column && column.filterRenderer == "DateTimeFilter") format = "YYYY-MM-DD hh:mm:ss";
-        knexOperation.whereBetween(fullFieldName, filter[2].map(date => moment(date).format(format)));
+        if (column && column.filterRenderer == "DateTimeFilter")
+          format = "YYYY-MM-DD hh:mm:ss";
+        knexOperation.whereBetween(
+          fullFieldName,
+          filter[2].map(date => moment(date).format(format))
+        );
       } else if (filter[1] == "FIND_IN_SET")
-        knexOperation.where(this.knex.raw(`FIND_IN_SET('${filter[2]}',${fullFieldName})`));
+        knexOperation.where(
+          this.knex.raw(`FIND_IN_SET('${filter[2]}',${fullFieldName})`)
+        );
       else knexOperation.where(fullFieldName, filter[1], filter[2]);
     });
     return knexOperation;
@@ -396,7 +463,10 @@ class ApiOperation {
 
   getFixedDates(fixedType) {
     var betweens = [];
-    var current_fiscal_year_start, current_fiscal_year_end, last_fiscal_year_start, last_fiscal_year_end;
+    var current_fiscal_year_start,
+      current_fiscal_year_end,
+      last_fiscal_year_start,
+      last_fiscal_year_end;
 
     if (moment().quarter() == 4) {
       current_fiscal_year_start = moment()
@@ -432,11 +502,16 @@ class ApiOperation {
     }
 
     if (fixedType == "HOY") betweens = [moment(), moment()];
-    else if (fixedType == "AYER") betweens = [moment().add(-1, "day"), moment().add(-1, "day")];
-    else if (fixedType == "CICLO") betweens = [moment().add(-1, "month"), moment()];
-    else if (fixedType == "ESTA SEMANA") betweens = [moment().startOf("week"), moment()];
-    else if (fixedType == "ESTE MES") betweens = [moment().startOf("month"), moment()];
-    else if (fixedType == "ESTE AÑOF") betweens = [current_fiscal_year_start, current_fiscal_year_end];
+    else if (fixedType == "AYER")
+      betweens = [moment().add(-1, "day"), moment().add(-1, "day")];
+    else if (fixedType == "CICLO")
+      betweens = [moment().add(-1, "month"), moment()];
+    else if (fixedType == "ESTA SEMANA")
+      betweens = [moment().startOf("week"), moment()];
+    else if (fixedType == "ESTE MES")
+      betweens = [moment().startOf("month"), moment()];
+    else if (fixedType == "ESTE AÑOF")
+      betweens = [current_fiscal_year_start, current_fiscal_year_end];
     else if (fixedType == "ULTIMO MES")
       betweens = [
         moment()
@@ -474,9 +549,13 @@ class ApiOperation {
           .add(-12, "month"),
         moment()
       ];
-    else if (fixedType == "ULTIMO AÑOF") betweens = [last_fiscal_year_start, last_fiscal_year_end];
+    else if (fixedType == "ULTIMO AÑOF")
+      betweens = [last_fiscal_year_start, last_fiscal_year_end];
 
-    return [betweens[0].format("YYYY-MM-DD 00:00:00"), betweens[1].format("YYYY-MM-DD 23:59:59")];
+    return [
+      betweens[0].format("YYYY-MM-DD 00:00:00"),
+      betweens[1].format("YYYY-MM-DD 23:59:59")
+    ];
   }
 
   get user() {
