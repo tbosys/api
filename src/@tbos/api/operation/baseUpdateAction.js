@@ -58,6 +58,11 @@ module.exports = class DefaultUpdateAction extends BaseAction {
           this.body[columnKey] = JSON.stringify(this.body[columnKey]);
         }
       }
+      if (this.metadata.properties[columnKey].isCSV) {
+        if (this.body[columnKey] && typeof this.body[columnKey] != "string") {
+          this.body[columnKey] = this.body[columnKey].join(",");
+        }
+      }
       if (
         this.metadata.properties[columnKey].type == "boolean" &&
         this.body[columnKey] != null

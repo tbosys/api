@@ -1,12 +1,9 @@
 {
   "$id": "http://example.com/example.json",
   "type": "object",
-  "limit": 1000,
-  "maxLimit": 5000,
   "restricted": [],
-  "title": "Reporte",
-  "key": "reporte",
-  "namespace": "auditoria",
+  "title": "List",
+  "key": "list",
   "secure": false,
   "properties": {
     "id": {
@@ -15,14 +12,14 @@
       "title": "Id"
     },
     "name": {
-      "$id": "/properties/fields",
+      "$id": "/properties/name",
       "type": "string",
       "title": "Nombre",
       "width": 450
     },
 
     "sums": {
-      "$id": "/properties/fields",
+      "$id": "/properties/sums",
       "type": "string",
       "element": "multiselectDynamic",
       "route": "reporte/queryProperties",
@@ -30,8 +27,8 @@
       "isJSON": true,
       "title": "sumas"
     },
-    "sort": {
-      "$id": "/properties/sort",
+    "sorts": {
+      "$id": "/properties/sorts",
       "type": "string",
       "element": "multiselectDynamic",
       "route": "reporte/queryProperties",
@@ -39,8 +36,8 @@
       "isJSON": true,
       "title": "orden"
     },
-    "fields": {
-      "$id": "/properties/fields",
+    "columns": {
+      "$id": "/properties/columns",
       "type": "string",
       "element": "multiselectDynamic",
       "route": "reporte/queryProperties",
@@ -53,13 +50,24 @@
       "type": "string",
       "element": "selectDynamic",
       "route": "reporte/queryTables",
-      "title": "Tipo"
+      "title": "Table"
+    },
+    "type": {
+      "$id": "/properties/type",
+      "type": "string",
+      "element": "selectDynamic",
+      "route": "reporte/queryTables",
+      "title": "Type"
     },
     "filters": {
       "$id": "/properties/filters",
       "type": "string",
       "isJSON": true,
       "title": "Filtros"
+    },
+    "ownerId": {
+      "$id": "/properties/ownerId",
+      "type": "integer"
     },
     "groups": {
       "$id": "/properties/groups",
@@ -86,26 +94,6 @@
       "formatter": "DateTimeFormatter"
     }
   },
-  "actions": ["Crear", "Editar"],
-  "belongsTo": [],
-  "required": [],
-  "table": { "sum": [], "fields": ["name", "table", "fields", "sums", "groups", "filters"] },
-  "layout": [
-    {
-      "title": "Detalles",
-      "fields": ["name", "table"]
-    },
-    {
-      "title": "Columnas",
-      "fields": ["fields"]
-    },
-    {
-      "title": "Columnas",
-      "fields": ["sums", "groups"]
-    },
-    {
-      "title": "Filtros",
-      "fields": ["filters"]
-    }
-  ]
+
+  "belongsTo": []
 }

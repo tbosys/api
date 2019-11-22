@@ -20,7 +20,7 @@ module.exports = opts => {
 
       if (!handler.response)
         throw new errors.SERVER_ERROR(
-          "The operation returned null, there is probasbly and error in the API Method"
+          "The operation returned null, there is probably an error in the API Method"
         );
 
       if (

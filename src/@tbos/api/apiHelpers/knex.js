@@ -1,6 +1,6 @@
 var mockDb = require("mock-knex");
 
-var Connection = function(database) {
+var Connection = function() {
   var pathPrefix = process.cwd();
   var knexFile = require(pathPrefix + "/knexfile");
   var env = process.env.NODE_ENV || "development";

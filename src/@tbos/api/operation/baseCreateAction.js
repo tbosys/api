@@ -23,6 +23,11 @@ module.exports = class DefaultCreateAction extends BaseAction {
           this.body[columnKey] = JSON.stringify(this.body[columnKey]);
         }
       }
+      if (this.metadata.properties[columnKey].isCSV) {
+        if (this.body[columnKey] && typeof this.body[columnKey] != "string") {
+          this.body[columnKey] = this.body[columnKey].join(",");
+        }
+      }
     });
   }
 

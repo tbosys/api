@@ -1,14 +1,19 @@
-var BaseAction = require("../../operation/baseCreateAction");
-var Errors = require("../../errors");
-var moment = require("moment-timezone");
+var BaseAction = rootRequire("@tbos/api/operation/baseUpdateAction");
+var Errors = rootRequire("@tbos/api/errors");
 
 module.exports = class DefaultCreateAction extends BaseAction {
-  async postCreate() {
+  async postUpdate() {
     if (this._.profileOwner) {
+      await this.knex
+        .table("profileOwner")
+        .delete()
+        .where("ownerId", this.body.id);
+
       var items = this._.profileOwner.map(item => {
         delete item.id;
         return item;
       });
+
       var promisses = items.map(item => {
         return this.getActionAndInvoke("profileOwner", "create", item);
       });

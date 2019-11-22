@@ -40,6 +40,7 @@ module.exports = opts => {
       }
       handler.context.method = method;
       handler.context.operation = operation;
+      handler.context.getOperation = getOperation;
       next();
     },
     after: null,
@@ -52,7 +53,7 @@ function getOperation(operationName) {
   var pathPrefix = process.cwd();
 
   var exists = fs.existsSync(
-    path.resolve(pathPrefix, "src", "routes", "api", operationName + ".js")
+    path.resolve(pathPrefix, "src", "routes", operationName, "index.js")
   );
 
   if (exists)
@@ -60,8 +61,8 @@ function getOperation(operationName) {
       pathPrefix,
       "src",
       "routes",
-      "api",
-      operationName + ".js"
+      operationName,
+      "index.js"
     ));
   else
     Operation = class Op extends BaseApiOperation {

@@ -8,9 +8,15 @@ module.exports = {
     ecmaVersion: 2018,
     sourceType: "module"
   },
+  globals: {
+    rootRequire: false,
+    rootExists: false,
+    requireSchema: false,
+    requireAction: false,
+    actionExists: false
+  },
   rules: {
     indent: ["error", 2],
-    "linebreak-style": ["error", "unix"],
     quotes: ["error", "double"],
     semi: ["error", "always"]
   }

@@ -281,7 +281,7 @@ class ApiOperation {
 
   getExternalMetadata(key) {
     try {
-      var metadata = requireSchema(key + ".json");
+      var metadata = this.context.schemaMap[key];
       metadata = this.validateMetadata(this._metadata);
       return metadata;
     } catch (e) {
@@ -293,7 +293,7 @@ class ApiOperation {
   getMetadata() {
     if (this._metadata) return this._metadata;
     try {
-      this._metadata = requireSchema((this.schema || this.table) + ".json");
+      this._metadata = this.context.schemaMap[this.schema || this.table];
       this._metadata = this.validateMetadata(this._metadata);
       return this._metadata;
     } catch (e) {
@@ -1008,10 +1008,8 @@ class ApiOperation {
     var Action;
     if (typeof fieldOrAction != "string") return fieldOrAction;
 
-    var exists = fs.existsSync(
-      path.resolve(__dirname, "../actions", table, fieldOrAction + ".js")
-    );
-    if (exists) Action = require(`../actions/${table}/${fieldOrAction}`);
+    var exists = actionExists(table, fieldOrAction);
+    if (exists) Action = requireAction(table, fieldOrAction);
     else if (typeof fallback != "string") return fallback;
     else if (
       [

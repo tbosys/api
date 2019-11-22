@@ -30,7 +30,7 @@ class ApiOperation {
 
   getExternalMetadata(key) {
     try {
-      var metadata = requireSchema(key + ".json");
+      var metadata = this.context.schemaMap[key];
       metadata = this.validateMetadata(this._metadata);
       return metadata;
     } catch (e) {
@@ -42,7 +42,7 @@ class ApiOperation {
   getMetadata() {
     if (this._metadata) return this._metadata;
     try {
-      this._metadata = requireSchema((this.schema || this.table) + ".json");
+      this._metadata = this.context.schemaMap[this.schema || this.table];
       this._metadata = this.validateMetadata(this._metadata);
       return this._metadata;
     } catch (e) {
@@ -104,6 +104,9 @@ class ApiOperation {
       columnKeys.forEach(columnKey => {
         if (metadata.properties[columnKey].isJSON && result[columnKey]) {
           result[columnKey] = JSON.parse(result[columnKey]);
+        }
+        if (metadata.properties[columnKey].isCSV && result[columnKey]) {
+          result[columnKey] = result[columnKey].split(",");
         }
       });
 
@@ -412,7 +415,7 @@ class ApiOperation {
       }
       if (!column)
         throw new Errors.VALIDATION_ERROR(
-          `${filter[0]} no pudo ser convertido en un metadata`
+          `${filter[0]} no se encontro como propiedad del JSON SCHEMA`
         );
       var fullFieldName = `${tableName}.${filterKey}`;
 

@@ -3,7 +3,6 @@ var Ajv = require("ajv");
 var localize = require("ajv-i18n");
 var Errors = require("../errors");
 // options can be passed, e.g. {allErrors: true}
-var Api = require("../api");
 var moment = require("moment-timezone");
 var Security = require("../apiHelpers/security");
 
@@ -49,7 +48,7 @@ class Action {
   }
 
   getOperation(table) {
-    var Operation = Api.getOperation(table);
+    var Operation = this.context.getOperation(table);
     return new Operation(this.context, this.user, this.knex);
   }
 
@@ -62,7 +61,7 @@ class Action {
 
     var ajv = new Ajv({ allErrors: true });
     try {
-      var schema = this.schemaOverwrite || requireSchema("schemaName");
+      var schema = this.schemaOverwrite || this.context.schemaMap[schemaName];
       if (requireFields == false) delete schema.required;
       if (
         typeof requireFields == "string" &&
@@ -102,7 +101,7 @@ class Action {
 
   getActionInstanceFor(table, fieldOrAction, fallback, securityChecked) {
     var Action;
-    var path;
+
     if (fallback == true) {
       fallback = null;
       securityChecked = true;
@@ -112,8 +111,10 @@ class Action {
     } else if (fallback == null) securityChecked = true;
 
     try {
-      path = `../actions/${table}/${fieldOrAction}`;
-      Action = typeof fieldOrAction == "string" ? require(path) : fieldOrAction;
+      Action =
+        typeof fieldOrAction == "string"
+          ? requireAction(table, fieldOrAction)
+          : fieldOrAction;
     } catch (e) {
       if (!e.code || e.code != "MODULE_NOT_FOUND") console.log(e);
       if (!fallback)
@@ -193,7 +194,7 @@ class Action {
     var dirParts = __dirname.split("/");
     if (!table) table = Action.table || this.table; //dirParts[dirParts.length - 1];
     try {
-      this._metadata = requireSchema(table + ".json");
+      this._metadata = this.context.schemaMap[table];
       return this._metadata;
     } catch (e) {
       console.log(e);
