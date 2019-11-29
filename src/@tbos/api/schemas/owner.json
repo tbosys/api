@@ -3,6 +3,7 @@
   "type": "object",
   "title": "Owner",
   "key": "owner",
+  "description": "Users and Permissions",
   "restricted": [],
   "properties": {
     "id": {

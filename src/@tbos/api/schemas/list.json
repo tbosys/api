@@ -4,7 +4,7 @@
   "restricted": [],
   "menu": false,
   "title": "Filter List",
-  "description":"Filters for Reports, ",
+  "description": "Filters for Reports, Views and Analisis",
   "key": "list",
   "secure": false,
   "properties": {

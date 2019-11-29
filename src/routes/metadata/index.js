@@ -20,7 +20,7 @@ class ApiOperation extends BaseOperation {
 
   async menu() {
     return Object.keys(this.context.schemaMap)
-      .filter.map(schemaKey => {
+      .map(schemaKey => {
         var schema = this.context.schemaMap[schemaKey];
         return {
           title: schema.title,

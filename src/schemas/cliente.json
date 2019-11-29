@@ -3,6 +3,7 @@
   "type": "object",
   "title": "Cliente",
   "key": "cliente",
+  "description": "Demo App for List Operations",
   "secure": false,
   "restricted": [],
   "properties": {

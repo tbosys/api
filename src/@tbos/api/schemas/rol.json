@@ -3,6 +3,8 @@
   "type": "object",
   "title": "Rol",
   "key": "rol",
+  "description": "Rols",
+  "menu": false,
   "restricted": [],
   "properties": {
     "id": {

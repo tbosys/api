@@ -3,6 +3,7 @@
   "type": "object",
   "title": "Profiles del Sistema",
   "key": "profile",
+  "description": "Profiles",
   "restricted": [],
   "properties": {
     "id": {

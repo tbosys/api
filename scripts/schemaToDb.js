@@ -20,7 +20,7 @@ function schemaToDb(file) {
 
   var props = [];
   Object.keys(jsonSchema.properties).forEach((key, index) => {
-    props.push({ id: index, name: key, ...jsonSchema.properties[key] });
+    props.push({ id: index, name: key, ...jsonSchema.properties````[key] });
   });
 
   var nj = {

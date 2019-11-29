@@ -4,6 +4,7 @@
   "title": "Orden",
   "key": "orden",
   "secure": false,
+  "description": "Demo App for Process Operations",
   "statusField": "status",
   "restricted": [],
   "properties": {
