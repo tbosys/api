@@ -1,0 +1,171 @@
+{
+  "properties": {
+    "id": {
+      "title": "Id",
+      "render": "string",
+      "sortable": true
+    },
+    "autocomplete": {
+      "filter": "string",
+      "render": "autocomplete",
+      "width": 200,
+      "nameField": "name"
+    },
+    "email": {
+      "title": "Email",
+      "filter": "string",
+      "render": "string",
+      "width": 250
+    },
+    "name": {
+      "title": "Nombre",
+      "filter": "string",
+      "render": "string",
+      "sort": true
+    },
+    "text": {
+      "filter": "text",
+      "render": "text",
+      "sort": false,
+      "width": 400
+    },
+    "string": {
+      "sortable": true,
+      "filter": "string",
+      "render": "string",
+      "sort": true
+    },
+    "json": {
+      "sortable": false,
+      "filter": "string",
+      "render": "string",
+      "sort": true
+    },
+    "csv": {
+      "sortable": false,
+      "filter": "string",
+      "render": "string"
+    },
+    "date": {
+      "sortable": true,
+      "element": "date",
+      "title": "Fecha",
+      "filter": "date",
+      "render": "date",
+      "width": 100
+    },
+    "select": {
+      "sortable": true,
+      "title": "Tipo",
+      "filter": "select",
+      "render": "select"
+    },
+    "number": {
+      "sortable": true,
+      "render": "number",
+      "filter": "number",
+      "default": 0
+    },
+    "integer": {
+      "sortable": true,
+      "render": "integer",
+      "filter": "integer",
+      "default": 0
+    },
+    "plazo": {
+      "extends": "integer",
+      "title": "Plazo",
+      "default": 0
+    },
+    "total": {
+      "title": "Total",
+      "extends": "number"
+    },
+    "subTotal": {
+      "title": "subTotal",
+      "extends": "number"
+    },
+    "impuesto": {
+      "title": "impuesto",
+      "extends": "number"
+    },
+    "descuento": {
+      "title": "descuento",
+      "extends": "number"
+    },
+
+    "clienteId": {
+      "title": "Cliente",
+      "filter": "string",
+      "render": "autocomplete",
+      "width": 200,
+      "nameField": "name",
+      "path": "crm/cliente",
+      "sortable": true
+    },
+
+    "transporteId": {
+      "sortable": true,
+      "title": "Transporte",
+      "table": "transporte",
+      "filter": "string",
+      "render": "autocomplete",
+      "nameField": "name",
+      "width": 220
+    },
+    "fecha": {
+      "title": "Fecha",
+      "extends": "date",
+      "sortable": true,
+      "width": 100
+    },
+
+    "zonaId": {
+      "sortable": true,
+      "title": "Zona",
+      "filter": "string",
+      "render": "autocomplete",
+      "nameField": "name",
+      "width": 150
+    },
+    "ownerId": {
+      "title": "Owner",
+      "filter": "string",
+      "render": "autocomplete",
+      "width": 200,
+      "nameField": "name",
+      "path": "crm/owner",
+      "sortable": true
+    },
+    "createdBy": {
+      "title": "Creado por",
+      "extends": "string"
+    },
+
+    "updatedBy": {
+      "title": "Actualizado por",
+      "extends": "string"
+    },
+    "createdAt": {
+      "title": "Creado",
+      "extends": "date",
+      "width": 150
+    },
+    "updatedAt": {
+      "title": "Actualizado",
+      "extends": "date",
+      "width": 150
+    },
+    "tipoCambio": {
+      "title": "Tipo Cambio",
+      "extends": "integer",
+      "default": 1
+    },
+    "moneda": {
+      "title": "moneda",
+      "enum": ["CRC", "USD"],
+      "extends": "select",
+      "default": "CRC"
+    }
+  }
+}

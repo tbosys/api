@@ -2,6 +2,7 @@
   "$id": "http://example.com/example.json",
   "type": "object",
   "restricted": [],
+  "menu":false,
   "properties": {
     "id": {
       "$id": "/properties/id",
@@ -44,5 +45,6 @@
       "title": "Actualizado"
     }
   },
-  "required": ["code"]
+  "required": ["code"],
+  "form": [{ "title": "info", "columns": ["code"] }]
 }

@@ -1,0 +1,44 @@
+{
+  "$id": "http://example.com/example.json",
+  "type": "object",
+  "title": "Cliente",
+  "key": "cliente",
+  "secure": false,
+  "restricted": [],
+  "properties": {
+    "id": {
+      "$id": "/properties/id",
+      "type": "integer",
+      "title": "Id",
+      "extends": "integer"
+    },
+    "name": {
+      "$id": "/properties/name",
+      "type": "string",
+      "title": "Nombre",
+      "default": "",
+      "extends": "name"
+    },
+    "code": {
+      "$id": "/properties/name",
+      "type": "string",
+      "title": "Code",
+      "default": ""
+    },
+    "ownerId": {
+      "$id": "/properties/ownerId",
+      "type": "integer",
+      "title": "Owner",
+      "width": 300
+    }
+  },
+  "required": [],
+  "belongsTo": ["owner"],
+  "form": [
+    {
+      "title": "Información",
+      "widths": [12, 6, 3],
+      "columns": ["name", "code"]
+    }
+  ]
+}

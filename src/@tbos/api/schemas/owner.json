@@ -1,0 +1,59 @@
+{
+  "$id": "http://example.com/example.json",
+  "type": "object",
+  "title": "Owner",
+  "key": "owner",
+  "restricted": [],
+  "properties": {
+    "id": {
+      "$id": "/properties/id",
+      "type": "integer"
+    },
+    "name": {
+      "$id": "/properties/name",
+      "type": "string",
+      "default": "",
+      "minLength": 2,
+      "width": 300,
+      "sort": true
+    },
+    "email": {
+      "$id": "/properties/email",
+      "type": "string",
+      "default": "",
+      "minLength": 3
+    },
+
+    "active": {
+      "title": "Activo",
+      "render": "boolean",
+      "filter": "boolean",
+      "default": true,
+      "width": 100
+    },
+    "profileSelector": {
+      "keyAlias": "_profileOwner",
+      "title": "Perfiles",
+      "render": "component",
+      "default": []
+    },
+    "createdBy": {},
+    "updatedBy": {},
+    "createdAt": {},
+    "updatedAt": {}
+  },
+  "belongsInMany": ["profileOwner"],
+  "required": ["name", "email", "active"],
+  "form": [
+    {
+      "title": "Usuario",
+      "widths": [12, 4, 3],
+      "columns": ["name", "email", "active"]
+    },
+    {
+      "title": "Permisos",
+      "widths": [12, 12, 12],
+      "columns": ["profileSelector"]
+    }
+  ]
+}

@@ -22,5 +22,6 @@
       "title": "Description"
     }
   },
-  "required": ["name"]
+  "required": ["name"],
+  "form": [{ "title": "info", "columns": ["name"] }]
 }

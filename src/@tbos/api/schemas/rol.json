@@ -21,5 +21,6 @@
       "default": ""
     }
   },
-  "required": ["table"]
+  "required": ["table"],
+  "form": [{ "title": "info", "columns": ["table"] }]
 }

@@ -3,6 +3,7 @@
   "type": "object",
   "title": "Profile Owner",
   "key": "profileOwner",
+  "menu": false,
   "restricted": [],
   "properties": {
     "id": {

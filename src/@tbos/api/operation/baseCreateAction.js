@@ -60,19 +60,21 @@ module.exports = class DefaultCreateAction extends BaseAction {
   }
 
   setDefaultValues() {
-    if (this.metadata.properties.namespaceId)
-      this.body.namespaceId = process.env.NODE_ENV;
     if (this.metadata.properties.createdBy)
       this.body.createdBy = this.user.name;
     if (!this.body.ownerId && this.metadata.properties.ownerId)
       this.body.ownerId = this.user.id;
     if (this.metadata.properties.updatedAt)
       this.body.updatedAt = moment().format("YYYY-MM-DD HH:mm:ss");
-    if (
-      this.metadata.properties.ownerName &&
-      this.context.userMap[this.body.ownerId]
-    )
-      this.body.ownerName = this.context.userMap[this.body.ownerId].name;
+
+    Object.keys(this.metadata.properties).forEach(propertyKey => {
+      if (
+        this.body[propertyKey] == null &&
+        this.metadata.properties[propertyKey].default != null
+      ) {
+        this.body[propertyKey] = this.metadata.properties[propertyKey].default;
+      }
+    });
   }
 
   async create(body) {

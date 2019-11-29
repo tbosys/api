@@ -103,6 +103,7 @@ class ApiOperation {
 
       columnKeys.forEach(columnKey => {
         if (metadata.properties[columnKey].isJSON && result[columnKey]) {
+          console.log(result[columnKey]);
           result[columnKey] = JSON.parse(result[columnKey]);
         }
         if (metadata.properties[columnKey].isCSV && result[columnKey]) {
@@ -328,8 +329,14 @@ class ApiOperation {
     function belongsTo(relation, table) {
       var names = [relation];
       var fieldProperties = metadata.properties[`${names[0]}Id`];
+      if (!fieldProperties)
+        throw new Errors.SERVER_ERROR(
+          `Relation ${relation} can't find property ${relation}Id in ${table}`
+        );
+      fieldProperties.table = fieldProperties.table || names[0];
 
-      var alias = fieldProperties.tableAlias || fieldProperties.table;
+      var alias =
+        fieldProperties.tableAlias || fieldProperties.table || names[0];
       if (fieldProperties.fields)
         fieldProperties.fields.forEach(relatedFieldArray => {
           parsedFields.push(

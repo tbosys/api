@@ -2,7 +2,9 @@
   "$id": "http://example.com/example.json",
   "type": "object",
   "restricted": [],
-  "title": "List",
+  "menu": false,
+  "title": "Filter List",
+  "description":"Filters for Reports, ",
   "key": "list",
   "secure": false,
   "properties": {
