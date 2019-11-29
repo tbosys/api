@@ -1,0 +1,13 @@
+var BaseAction = rootRequire("@tbos/api/operation/baseAction");
+var Errors = rootRequire("@tbos/api/errors");
+
+module.exports = class AprobarAction extends BaseAction {
+  async execute(table, body) {
+    await this.getActionAndInvoke(table, "bulkUpdateAction", {
+      delta: { status: "por imprmir" },
+      ids: body.ids
+    });
+
+    return true;
+  }
+};
