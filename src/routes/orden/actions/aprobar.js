@@ -3,11 +3,9 @@ var Errors = rootRequire("@tbos/api/errors");
 
 module.exports = class AprobarAction extends BaseAction {
   async execute(table, body) {
-    await this.getActionAndInvoke(table, "bulkUpdateAction", {
-      delta: { status: "por imprmir" },
-      ids: body.ids
+    var results = await this.getActionAndInvoke(table, "bulkUpdate", {
+      items: body.ids.map(id => ({ id: id, status: "por imprimir" }))
     });
-
-    return true;
+    return results;
   }
 };

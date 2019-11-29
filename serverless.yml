@@ -11,6 +11,11 @@ plugins:
   - serverless-plugin-aws-alerts
 
 custom:
+  DB_PASSWORD:
+    local: password
+    development: ${env:DB_PASSWORD}
+    staging: ${ssm:DB_PASSWORD}
+    production: ${ssm:DB_PASSWORD}
   defaultRegion: us-east-1
   defaultEnvironmentGroup: dev-staging
   region: ${opt:region, self:custom.defaultRegion}
@@ -86,7 +91,7 @@ functions:
     memorySize: 824
     environment:
       NODE_ENV: ${self:custom.stage}
-      DB_PASSWORD: ${ssm:DB_PASSWORD}
+      DB_PASSWORD: ${env:DB_PASSWORD}
     alarms: # merged with function alarms
       - functionErrors
     events:

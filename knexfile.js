@@ -8,7 +8,7 @@ module.exports = {
       user: "root",
       host: "127.0.0.1",
       database: "dev",
-      password: process.env.DB_PASSWORD || "",
+      password: process.env.DB_PASSWORD,
       timezone: "UTC",
       typeCast: function(field, next) {
         if (field.type == "DATETIME" || field.type == "TIMESTAMP") {
