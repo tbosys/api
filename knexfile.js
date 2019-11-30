@@ -9,7 +9,7 @@ module.exports = {
       host: "127.0.0.1",
       database: "dev",
       password: process.env.DB_PASSWORD,
-      timezone: "UTC",
+      timezone: "+00:00",
       typeCast: function(field, next) {
         if (field.type == "DATETIME" || field.type == "TIMESTAMP") {
           return moment(field.string()).format("YYYY-MM-DD HH:mm:ss");

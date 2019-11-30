@@ -1,15 +1,7 @@
-var BigNumber = require("bignumber.js");
-const Dinero = require("dinero.js");
-Dinero.globalLocale = "es-CR";
-Dinero.defaultPrecision = 5;
-
 const Errors = require("../errors");
-var path = require("path");
 var moment = require("moment");
 var BaseQuery = require("./baseQuery");
-
 var Security = require("../apiHelpers/security");
-var fs = require("fs");
 
 class ApiOperation {
   constructor(context, user, knex) {
@@ -43,7 +35,7 @@ class ApiOperation {
   async _destroy(body) {
     if (body.ids[0] == null) throw new Errors.INVALID_ERROR("No rows selected");
 
-    var trx = await this.createTransaction();
+    var trx = await this.knex.transaction();
     try {
       var current = await this.one({ id: body.ids[0] });
       var metadata = this.getMetadata();
@@ -70,7 +62,7 @@ class ApiOperation {
   async _update(body) {
     if (!body.id) throw new Errors.VALIDATION_ERROR(["id"]);
 
-    var trx = await this.createTransaction();
+    var trx = await this.knex.transaction();
     try {
       var Action = this.getActionFor(this.table, "update", "Update");
       var action = new Action(this.user, trx, this.context);
@@ -186,7 +178,7 @@ class ApiOperation {
 
   executeAction(actionName, Action) {
     return async body => {
-      var trx = await this.createTransaction();
+      var trx = await this.knex.transaction();
       try {
         var action = new Action(this.user, trx, this.context);
         action.table = this.table;
@@ -204,7 +196,7 @@ class ApiOperation {
   }
 
   async _create(body) {
-    var trx = await this.createTransaction();
+    var trx = await this.knex.transaction();
     try {
       var Action = this.getActionFor(this.table, "create", "Create");
       var action = new Action(this.user, trx, this.context);
@@ -223,7 +215,7 @@ class ApiOperation {
   }
 
   async _aprobar(body) {
-    var trx = await this.createTransaction();
+    var trx = await this.knex.transaction();
     try {
       var Action = this.getActionFor(this.table, "aprobar", "Aprobar");
       var action = new Action(this.user, trx, this.context);
@@ -244,7 +236,7 @@ class ApiOperation {
   }
 
   async _aplicar(body) {
-    var trx = await this.createTransaction();
+    var trx = await this.knex.transaction();
     try {
       var Action = this.getActionFor(this.table, "aplicar", "Aplicar");
       var action = new Action(this.user, trx, this.context);
@@ -1086,14 +1078,6 @@ Number.prototype.pad = function(size) {
   return s;
 };
 
-Number.prototype.to5 = function() {
-  return Dinero({ amount: parseInt(this * 100000) }).toFormat("0.00000");
-};
-
-Number.prototype.to2 = function() {
-  return Dinero({ amount: parseInt(this * 100000) }).toFormat("0.00");
-};
-
 String.prototype.pad = function(size) {
   var s = String(this);
   while (s.length < (size || 2)) {
@@ -1109,23 +1093,6 @@ Number.prototype.pad = function(size) {
     s = "0" + s;
   }
   return s;
-};
-
-//Devuelve un instance de BigNumber, no un numbero
-Number.dineroRaw = function(a, b, operation) {
-  var aa = new BigNumber(a || 0);
-  var bb = new BigNumber(b || 0);
-
-  return aa[operation](bb);
-};
-
-Number.dineroString = function(a, b, operation) {
-  return Number.dineroRaw(a, b, operation).toFixed(5);
-};
-
-//Devuelve un numero;
-Number.dineroNumber = function(a, b, operation) {
-  return Number.dineroRaw(a, b, operation).toNumber();
 };
 
 module.exports = ApiOperation;

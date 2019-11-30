@@ -38,7 +38,7 @@ module.exports = opts => {
 
       console.log("PARSER_JSON", JSON.stringify(logError));
 
-      if (!handler.error.status || handler.error.status > 499) {
+      if (!handler.error.status) {
         handler.response = {
           statusCode: handler.error.status || 500,
           body: JSON.stringify(
