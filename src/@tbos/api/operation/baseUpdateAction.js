@@ -7,10 +7,7 @@ module.exports = class DefaultUpdateAction extends BaseAction {
   async execute(table, body, current) {
     this.table = table;
     this.body = body;
-    if (!body.id)
-      throw new Errors.VALIDATION_ERROR(
-        `El API request debe tener el id y no lo tiene. ${this.table} ${body.id}`
-      );
+    if (!body.id) throw new Errors.VALIDATION_ERROR(["id"]);
 
     this.current = await this.knex
       .table(this.table)
@@ -18,9 +15,7 @@ module.exports = class DefaultUpdateAction extends BaseAction {
       .where("id", this.body.id)
       .first();
     if (!this.current || !this.current.id)
-      throw new Errors.VALIDATION_ERROR(
-        "No se encontro una fila con ese id: " + this.body.id
-      );
+      throw new Errors.ITEM_NOT_FOUND(this.table, this.body.id);
 
     this.metadata = this.getMetadata(this.table);
     return this.update();
@@ -94,10 +89,14 @@ module.exports = class DefaultUpdateAction extends BaseAction {
         }
       });
 
-      if (this.current && this.current.estado == "archivado")
-        throw new Errors.VALIDATION_ERROR(
-          `La fila ${this.current.id} seleccionada en ${this.metadata.key} ya esta archivada, no se puede modificar.`
-        );
+      if (
+        this.current &&
+        this.current[this.metadata.statusField] == "archivado"
+      )
+        throw new Errors.INVALID_ERROR("ROW_IS_ARCHIVED", [
+          this.current.id,
+          this.metadata.key
+        ]);
 
       this.preTransform();
       this.preValidate();

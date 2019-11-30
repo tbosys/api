@@ -14,12 +14,15 @@ class Files extends BaseOperation {
   async sendTemplate(body) {
     if (!body.ids || body.ids.length == 0) delete body.ids;
 
-    if (!body.template) throw new Errors.VALIDATION_ERROR("Debe escoger un template");
-    //if (!body.message) throw new Errors.VALIDATION_ERROR("Debe ingresar un mensaje");
+    if (!body.template) throw new Errors.VALIDATION_ERROR(["template"]);
 
     await invokeLambda("emails", "baseTemplate", {
       ...body,
-      user: { id: this.context.user.id, name: this.context.user.name, email: this.context.user.email },
+      user: {
+        id: this.context.user.id,
+        name: this.context.user.name,
+        email: this.context.user.email
+      },
       account: this.context.account
     });
     return true;

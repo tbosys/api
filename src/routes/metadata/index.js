@@ -11,7 +11,7 @@ class ApiOperation extends BaseOperation {
     this._knex = knex;
   }
   get table() {
-    return "list";
+    return "metadata";
   }
 
   get secure() {

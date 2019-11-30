@@ -19,7 +19,7 @@ module.exports = opts => {
           return;
         })
         .catch(e => {
-          throw new errors.AUTH_ERROR(e.label || e.message);
+          throw new errors.SERVER_ERROR(e.label || e.message, 5);
         });
     },
     after: null,

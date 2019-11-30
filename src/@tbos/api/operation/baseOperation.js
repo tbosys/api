@@ -41,10 +41,7 @@ class ApiOperation {
   }
 
   async _destroy(body) {
-    if (body.ids[0] == null)
-      throw new Errors.VALIDATION_ERROR(
-        "Debe escoger al menos una fila por borrar"
-      );
+    if (body.ids[0] == null) throw new Errors.INVALID_ERROR("No rows selected");
 
     var trx = await this.createTransaction();
     try {
@@ -71,10 +68,8 @@ class ApiOperation {
   }
 
   async _update(body) {
-    if (!body.id)
-      throw new Errors.VALIDATION_ERROR(
-        "El API request debe tener el id y no lo tiene."
-      );
+    if (!body.id) throw new Errors.VALIDATION_ERROR(["id"]);
+
     var trx = await this.createTransaction();
     try {
       var Action = this.getActionFor(this.table, "update", "Update");
@@ -189,19 +184,8 @@ class ApiOperation {
     return knexOperation;
   }
 
-  isMultiRowAction() {
-    var metadata = this.getMetadata();
-    return metadata.multiRowAction != true;
-  }
-
   executeAction(actionName, Action) {
-    var _this = this;
     return async body => {
-      if (this.isMultiRowAction() && body.ids && body.ids.length > 1)
-        throw new Errors.VALIDATION_ERROR(
-          "La acciones solo pueden tener un fila"
-        );
-
       var trx = await this.createTransaction();
       try {
         var action = new Action(this.user, trx, this.context);
@@ -286,7 +270,7 @@ class ApiOperation {
       return metadata;
     } catch (e) {
       console.log(e);
-      throw new Errors.ITEM_NOT_FOUND(`Metadata ${this.table} no se encontro`);
+      throw new Errors.ITEM_NOT_FOUND(this.table, "metadata");
     }
   }
 
@@ -298,7 +282,7 @@ class ApiOperation {
       return this._metadata;
     } catch (e) {
       console.log(e);
-      throw new Errors.ITEM_NOT_FOUND(`Metadata ${this.table} no se encontro`);
+      throw new Errors.ITEM_NOT_FOUND(this.table, "metadata");
     }
   }
 
@@ -406,7 +390,7 @@ class ApiOperation {
     });
     if (body.activo == false) return body;
     else if (!results || !results[0] || !results[0].id)
-      throw new Errors.ITEM_NOT_FOUND(body.id, this.table);
+      throw new Errors.ITEM_NOT_FOUND(this.table, body.id);
     return results[0];
   }
 
@@ -528,12 +512,14 @@ class ApiOperation {
     knexOperation = this.getSelectQuery(knexOperation, body);
     knexOperation = this.toMultiTenantQuery(knexOperation);
 
+    var statusField = metadata.statusField;
+
     knexOperation = this.processQueryFilter(knexOperation, body);
     if (body.id)
       knexOperation = knexOperation.where({ [`${this.table}.id`]: body.id });
-    if (body.inProgress && metadata.properties.estado)
+    if (body.inProgress && metadata.properties[statusField])
       knexOperation = knexOperation.whereNot(
-        `${this.table}.estado`,
+        `${this.table}.${statusField}`,
         "archivado"
       );
 
@@ -550,10 +536,9 @@ class ApiOperation {
 
     //TODO FIX THIS
     if (body.order) knexOperation = knexOperation.orderBy(body.order, "ASC");
-    else if (metadata.properties.estado) {
-      var order = `FIELD(${
-        this.table
-      }.estado, ${metadata.properties.estado.enum
+    else if (metadata.properties[statusField]) {
+      var enumList = metadata.properties[metadata.statusField].enum;
+      var order = `FIELD(${this.table}.statusFields, ${enumList
         .map(item => `"${item}"`)
         .join(",")} ) ASC`;
       knexOperation = knexOperation.orderByRaw(order);
@@ -568,7 +553,11 @@ class ApiOperation {
       if (!body.inProgress && !body.limitless)
         knexOperation = knexOperation.limit(2000);
 
-      if (body.inProgress && !body.limitless && !metadata.properties.estado)
+      if (
+        body.inProgress &&
+        !body.limitless &&
+        !metadata.properties[metadata.statusField]
+      )
         knexOperation = knexOperation.limit(metadata.limit || 100);
     }
     //console.log(knexOperation.toString());
@@ -586,9 +575,9 @@ class ApiOperation {
     knexOperation = this.processQueryFilter(knexOperation, body);
     if (body.id)
       knexOperation = knexOperation.where({ [`${this.table}.id`]: body.id });
-    if (body.inProgress && metadata.properties.estado)
+    if (body.inProgress && metadata.properties[metadata.statusField])
       knexOperation = knexOperation.whereNot(
-        `${this.table}.estado`,
+        `${this.table}.${metadata.statusField}`,
         "archivado"
       );
 
@@ -631,8 +620,7 @@ class ApiOperation {
       );
     else if (body.count) {
       knexOperation = knexOperation.count(`${this.parseField("id")} as count`);
-    } else
-      throw new Errors.VALIDATION_ERROR("Debe escoger un campo para sumar");
+    } else throw new Errors.VALIDATION_ERROR(["sumFields"]);
     var parsedGroupBy = [];
     var parsedSelect = [];
     if (!body.groupBy) body.groupBy = [];
@@ -1012,15 +1000,9 @@ class ApiOperation {
     if (exists) Action = requireAction(table, fieldOrAction);
     else if (typeof fallback != "string") return fallback;
     else if (
-      [
-        "Action",
-        "Create",
-        "Destroy",
-        "Query",
-        "Update",
-        "Aprobar",
-        "Aplicar"
-      ].indexOf(fallback) > -1
+      ["Action", "Create", "Destroy", "Query", "Update", "BulkUpdate"].indexOf(
+        fallback
+      ) > -1
     )
       Action = require(`./base${fallback}Action`);
 

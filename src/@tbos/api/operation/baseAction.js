@@ -7,17 +7,11 @@ var moment = require("moment-timezone");
 var Security = require("../apiHelpers/security");
 
 class Action {
-  constructor(user, knex, schemaOverwrite, context) {
+  constructor(user, knex, context) {
     this.user = user;
     this.knex = knex;
-    if (schemaOverwrite) {
-      if (schemaOverwrite == true || schemaOverwrite == false)
-        this.schemaOverwrite = schemaOverwrite;
-      else context = schemaOverwrite;
-    }
     this.context = context;
-    if (!this.context)
-      throw new Errors.SERVER_ERROR("Se intenta crear un action sin context");
+    if (!this.context) throw new Errors.INTEGRATION_ERROR("ACTION_NO_CONTEXT");
   }
 
   get Errors() {
@@ -33,7 +27,6 @@ class Action {
     if (id == "") id = null;
 
     var audit = {
-      account: this.context.account,
       ownerId: this.context.user.id,
       ownerName: this.context.user.name,
       type: this.table,
@@ -61,7 +54,7 @@ class Action {
 
     var ajv = new Ajv({ allErrors: true });
     try {
-      var schema = this.schemaOverwrite || this.context.schemaMap[schemaName];
+      var schema = this.context.schemaMap[schemaName];
       if (requireFields == false) delete schema.required;
       if (
         typeof requireFields == "string" &&
@@ -75,13 +68,10 @@ class Action {
     var valid = validate(item);
     if (!valid) {
       //localize.es(Ajv.errors);
-      throw new Errors.VALIDATION_ERROR(
-        `Error en ${schema.title || schema.key} ${ajv.errorsText(
-          validate.errors,
-          {
-            separator: "\n"
-          }
-        )}`,
+      throw new Errors.VALIDATION_WITH_FIELDS_ERROR(
+        `${schema.title || schema.key} ${ajv.errorsText(validate.errors, {
+          separator: "\n"
+        })}`,
         validate.errors,
         body
       );
@@ -191,60 +181,54 @@ class Action {
   }
 
   getMetadata(table) {
-    var dirParts = __dirname.split("/");
     if (!table) table = Action.table || this.table; //dirParts[dirParts.length - 1];
     try {
       this._metadata = this.context.schemaMap[table];
       return this._metadata;
     } catch (e) {
       console.log(e);
-      throw new Errors.ITEM_NOT_FOUND(`Metadata ${table} no se encontro`);
+      throw new Errors.ITEM_NOT_FOUND(table, "metadata");
     }
   }
 
   enforceSingleId(body) {
     if (!body.ids || body.ids.length == 0)
-      throw new Errors.VALIDATION_ERROR(
-        "Debe seleccionar una fila para ejecutar esta accion."
-      );
+      throw new Errors.INVALID_ERROR("ENFORCE_SINGLE_ROW");
     var id = body.ids[0];
     return id;
   }
 
   async enforceNotStatus(body, expectedEstado) {
     var metadata = this.getMetadata();
-    if (!metadata.properties.estado) return Promise.resolve({});
-    var knexPromise = this.knex.table(this.table).select("estado");
+    if (!metadata.properties[metadata.statusField]) return Promise.resolve({});
+    var knexPromise = this.knex.table(this.table).select(metadata.statusField);
     if (body.ids) knexPromise = knexPromise.whereIn("id", body.ids);
     else knexPromise = knexPromise.where("id", body.ids);
 
     if (Array.isArray(expectedEstado))
-      knexPromise = knexPromise.whereIn("estado", expectedEstado);
-    else knexPromise = knexPromise.where("estado", expectedEstado);
+      knexPromise = knexPromise.whereIn(metadata.statusField, expectedEstado);
+    else knexPromise = knexPromise.where(metadata.statusField, expectedEstado);
 
     var results = await knexPromise;
     if (results.length > 0)
-      throw new Errors.VALIDATION_ERROR(
-        "La fila esta en un estado que no se puede borrar"
-      );
+      throw new Errors.INVALID_ERROR("CANT_DELETE_IN_STATE");
   }
 
   async enforceStatus(body, expectedEstado) {
+    var metadata = this.getMetadata();
     if (Action.IgnoreEnforceStatus) return;
 
-    var knexPromise = this.knex.table(this.table).select("estado");
+    var knexPromise = this.knex.table(this.table).select(metadata.statusField);
     if (body.ids) knexPromise = knexPromise.whereIn("id", body.ids);
     else knexPromise = knexPromise.where("id", body.ids);
 
     if (Array.isArray(expectedEstado))
-      knexPromise = knexPromise.whereIn("estado", expectedEstado);
-    else knexPromise = knexPromise.where("estado", expectedEstado);
+      knexPromise = knexPromise.whereIn(metadata.statusField, expectedEstado);
+    else knexPromise = knexPromise.where(metadata.statusField, expectedEstado);
 
     var results = await knexPromise;
     if (results.length == 0 || results.length != body.ids.length)
-      throw new Errors.VALIDATION_ERROR(
-        "El estado de una de las filas no es " + expectedEstado
-      );
+      throw new Errors.INVALID_ERROR("WRONG_STATUS", [expectedEstado]);
 
     return results;
   }

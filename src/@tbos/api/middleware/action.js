@@ -22,9 +22,9 @@ module.exports = opts => {
         handler.context.knex
       );
       if (operation.secure && !handler.context.user)
-        throw new errors.AUTH_ERROR(
-          `Operation ${handler.context.parts.operationName} is secure and user is not authenticated`
-        );
+        throw new errors.AUTH_ERROR("OPERATION_SECURED_NO_AUTH", [
+          handler.context.parts.operationName
+        ]);
 
       var method = operation[handler.context.parts.methodName];
       if (!method) {
@@ -78,3 +78,5 @@ function getOperation(operationName) {
     };
   return Operation;
 }
+
+module.exports.getOperation = getOperation;

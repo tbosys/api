@@ -35,7 +35,7 @@ class ApiOperation {
       return metadata;
     } catch (e) {
       console.log(e);
-      throw new Errors.ITEM_NOT_FOUND(`Metadata ${this.table} no se encontro`);
+      throw new Errors.ITEM_NOT_FOUND(this.table, "metadata");
     }
   }
 
@@ -47,7 +47,7 @@ class ApiOperation {
       return this._metadata;
     } catch (e) {
       console.log(e);
-      throw new Errors.ITEM_NOT_FOUND(`Metadata ${this.table} no se encontro`);
+      throw new Errors.ITEM_NOT_FOUND(this.table, "metadata");
     }
   }
 
@@ -242,11 +242,8 @@ class ApiOperation {
     knexOperation = this.processQueryFilter(knexOperation, body);
     if (body.id)
       knexOperation = knexOperation.where({ [`${this.table}.id`]: body.id });
-    if (body.inProgress && metadata.properties.estado)
-      knexOperation = knexOperation.whereNot(
-        `${this.table}.estado`,
-        "archivado"
-      );
+    if (body.inProgress && metadata.properties[metadata.statusField])
+      knexOperation = knexOperation.whereNot(`${this.table}.`, "archivado");
 
     if (
       !body.fromOne &&
@@ -330,9 +327,11 @@ class ApiOperation {
       var names = [relation];
       var fieldProperties = metadata.properties[`${names[0]}Id`];
       if (!fieldProperties)
-        throw new Errors.SERVER_ERROR(
-          `Relation ${relation} can't find property ${relation}Id in ${table}`
-        );
+        throw new Errors.INTEGRATION_ERROR("RELATION_NOT_FOUND", [
+          relation,
+          table
+        ]);
+
       fieldProperties.table = fieldProperties.table || names[0];
 
       var alias =
@@ -412,18 +411,18 @@ class ApiOperation {
         //table.propertyKey
         var parts = filterKey.split(".");
         if (!parts.length > 0)
-          throw new Errors.VALIDATION_ERROR(
-            `Maximo dos relaciones en el query ${filter[0]}`
-          );
+          throw new Errors.INTEGRATION_ERROR("TOO_DEEP_REFERENCE", [filter[0]]);
+
         tableName = parts[0];
         filterKey = parts[1];
         var otherMetadata = this.getExternalMetadata(tableName);
         column = otherMetadata.properties[filterKey];
       }
       if (!column)
-        throw new Errors.VALIDATION_ERROR(
-          `${filter[0]} no se encontro como propiedad del JSON SCHEMA`
-        );
+        throw new Errors.INTEGRATION_ERROR("FIELD_NOT_FOUND", [
+          filter[0],
+          tableName
+        ]);
       var fullFieldName = `${tableName}.${filterKey}`;
 
       if (column && column.excludeFromQuery) return;
@@ -444,7 +443,10 @@ class ApiOperation {
           `%${filter[2]}%`
         );
       } else if (filter[1] == "IN_PROGRESS") {
-        knexOperation.whereNot(`${this.table}.estado`, "archivado");
+        knexOperation.whereNot(
+          `${this.table}.${this.metadata.statusField}`,
+          "archivado"
+        );
       } else if (
         filter[1] == "LIKE" &&
         filter[2] &&

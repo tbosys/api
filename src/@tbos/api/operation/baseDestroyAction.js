@@ -19,7 +19,11 @@ module.exports = class DefaultUpdateFieldAction extends BaseAction {
 
   async destroy(table, body, current, metadata) {
     //var id = this.enforceSingleId(body);
-    await this.enforceNotStatus(body, ["por archivar", "archivado"]);
+    await this.enforceNotStatus(
+      body,
+      ["por archivar", "archivado"],
+      this.metadata
+    );
 
     try {
       this.checkSecurity();

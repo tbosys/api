@@ -23,7 +23,7 @@ module.exports = {
 
   checkQuery: function(table, user) {
     if (!checkAdmin(user) && isRoleMising(user, table, "query"))
-      throw new Errors.PERMISSION_ERROR(`No tiene permiso para ver datos de ${table}`);
+      throw new Errors.PERMISSION_ERROR("READ", table);
   },
 
   checkAction: function(table, user, Action, actionName, actionInstance = {}) {
@@ -33,7 +33,7 @@ module.exports = {
       !checkAdmin(user) &&
       isRoleMising(user, table, actionName)
     )
-      throw new Errors.PERMISSION_ERROR(`No tiene permiso para la acción ${actionName}`);
+      throw new Errors.PERMISSION_ERROR(actionName, table);
   },
 
   checkUpdate: function(metadata, user, fields, functions) {
@@ -41,7 +41,7 @@ module.exports = {
     if (isAdmin) return true;
 
     if (isRoleMising(user, metadata.key, "update"))
-      throw new Errors.PERMISSION_ERROR(`No tiene permiso para editar ${metadata.key}`);
+      throw new Errors.PERMISSION_ERROR("UPDATE", metadata.key);
 
     var restrictedFields = metadata.restricted;
 
@@ -53,10 +53,10 @@ module.exports = {
       var customFunctions = functions ? functions[restrictedKey] : null;
       var customFunctionResult = customFunctions ? customFunctions() : null;
       if (customFunctionResult == false) {
-        throw new Errors.PERMISSION_ERROR(`No tiene permiso para editar ${restrictedKey}`);
+        throw new Errors.PERMISSION_ERROR("UPDATE", restrictedKey);
       } else if (customFunctionResult) return true;
       else if (user.roles.indexOf(`${metadata.key}_${restrictedKey}`) == -1)
-        throw new Errors.PERMISSION_ERROR(`No tiene permiso para editar ${restrictedKey}`);
+        throw new Errors.PERMISSION_ERROR("UPDATE", restrictedKey);
     });
   },
 
@@ -65,11 +65,12 @@ module.exports = {
     if (isAdmin) return true;
 
     if (!isAdmin && isRoleMising(user, metadata.key, "create"))
-      throw new Errors.PERMISSION_ERROR(`No tiene permiso para crear ${metadata.key}`);
+      throw new Errors.PERMISSION_ERROR("CREATE", metadata.key);
 
     var restrictedFields = metadata.restricted;
     let found = [];
-    if (restrictedFields) found = fields.some(r => restrictedFields.indexOf(r) >= 0);
+    if (restrictedFields)
+      found = fields.some(r => restrictedFields.indexOf(r) >= 0);
 
     var foundItems = fields.filter(function(item) {
       return restrictedFields.indexOf(item) > -1;
@@ -84,6 +85,6 @@ module.exports = {
     var isAdmin = checkAdmin(user);
     if (isAdmin) return true;
     if (!isAdmin && isRoleMising(user, metadata.key, "destroy"))
-      throw new Errors.PERMISSION_ERROR(`No tiene permiso para borrar ${metadata.key}`);
+      throw new Errors.PERMISSION_ERROR("DELETE", metadata.key);
   }
 };

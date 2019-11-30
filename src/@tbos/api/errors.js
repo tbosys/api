@@ -1,92 +1,75 @@
-var constaints = [
-  {
-    name: "segmento_name_empresaid_unique",
-    constraint: { field: "name", message: "El campo nombre ya se encuentra en la base de datos" }
-  }
-];
-
 module.exports = {
   TIMEOUT_ERROR: class SERVER_ERROR extends Error {
     constructor() {
       super();
-      this.message = "Timeout";
-      this.label =
-        "La operacion duro mucho tiempo y no se pudo completar. Recarge la pagina para ver los cambios.";
+      this.title = "Operation took too long";
+      this.message =
+        "The operation took to long and the server had to cancel. Please refresh you data";
       this.solution = "RELOAD";
-      this.name = "TIMEOUT_ERROR";
       this.type = "TIMEOUT_ERROR";
       this.status = 508;
     }
   },
 
   SERVER_ERROR: class SERVER_ERROR extends Error {
-    constructor(message) {
+    constructor(message, title) {
       super();
       this.message = message;
-      this.label = message;
+      this.title = title || "Server Error";
       this.solution = "RETRY";
-      this.name = "SERVER_ERROR";
       this.type = "SERVER_ERROR";
       this.status = 504;
     }
   },
 
-  DUPLICATE_FIELD: class DUPLICATE_FIELD extends Error {
-    constructor(sqlError, key) {
-      super();
-
-      this.message = sqlError.sqlMessage;
-      this.label = `El campo ${key} se esta utilizando y no se puede volver a usar.`;
-      this.solution = "INPUT";
-      this.name = "DUPLICATE_FIELD";
-      this.type = "DUPLICATE_FIELD";
-      this.status = 409;
-    }
-  },
-
   DUPLICATE_ERROR: class DUPLICATE_ERROR extends Error {
-    constructor(sqlError, body) {
+    constructor(sqlError) {
       super();
-      var constraint = {
-        field: "*",
-        message: "Un campo se encuentra en la base de datos y no puede ser duplicado"
-      };
-      constaints.forEach(function(constraintLoop) {
-        if (sqlError.sqlMessage.indexOf(constraintLoop.name) > -1) constraint = constraintLoop.constraint;
-      });
-
       this.message = sqlError.sqlMessage;
-      this.label = constraint.message;
-      this.solution = "INPUT";
-      this.duplicateKey = constraint.key;
-      this.name = "DUPLICATE_ERROR";
+      this.title = "Duplicate or Conflict";
       this.type = "DUPLICATE_ERROR";
       this.status = 409;
     }
   },
 
-  VALIDATION_ERROR: class VALIDATION_ERROR extends Error {
-    constructor(message, errorArray, body) {
+  INVALID_ERROR: class VALIDATION_ERROR extends Error {
+    constructor(message) {
       super();
-      this.message = JSON.stringify(body);
-      this.label = message;
-      this.errors = errorArray;
-      this.solution = "INPUT";
-      this.name = "VALIDATION_ERROR";
+      this.message = message;
+      this.title = "Operation is not valid";
+      this.type = "INVALID_OPERATION";
+      this.status = 400;
+    }
+  },
+
+  VALIDATION_ERROR: class VALIDATION_ERROR extends Error {
+    constructor(fields) {
+      super();
+      this.message = "Error in " + fields.join(" ");
+      this.title = "Validation Error";
+      this.errors = fields;
       this.type = "VALIDATION_ERROR";
       this.status = 400;
     }
   },
 
-  UPDATE_WITHOUT_RESULT: class UPDATE_WITHOUT_RESULT extends Error {
-    constructor(table, id, field, old, n) {
+  VALIDATION_WITH_FIELDS_ERROR: class VALIDATION_WITH_FIELDS_ERROR extends Error {
+    constructor(message, errorArray) {
       super();
-      this.message = `No se encontro el id ${id} en ${table} para hacer el update de ${JSON.stringify(
-        old
-      )} a ${JSON.stringify(n)}`;
-      this.label = `Ocurrio un error, no podemos encontrar este ${table}.`;
-      this.solution = "RELOAD";
-      this.name = "UPDATE_WITHOUT_RESULT";
+      this.message = message;
+      this.title = "Data not valid";
+      this.errors = errorArray;
+      this.type = "VALIDATION_WITH_FIELDS_ERROR";
+      this.status = 400;
+    }
+  },
+
+  UPDATE_WITHOUT_RESULT: class UPDATE_WITHOUT_RESULT extends Error {
+    constructor(table, id) {
+      super();
+      this.message = `${id} not found on ${table} to update`;
+      this.title = `${table} and ${id} could not be found`;
+
       this.type = "UPDATE_WITHOUT_RESULT";
       this.status = 400;
     }
@@ -95,70 +78,58 @@ module.exports = {
   ITEM_NOT_FOUND: class ITEM_NOT_FOUND extends Error {
     constructor(table, id = "") {
       super();
-      this.message = `No se encontro ${id} en ${table}`;
-      this.label = `Ocurrio un error, no podemos encontrar este ${table} ${id}.`;
-      this.solution = "RELOAD";
-      this.name = "ITEM_NOT_FOUND";
+      this.message = `${id} not found on ${table}`;
+      this.title = "Id provided not found";
       this.type = "ITEM_NOT_FOUND";
       this.status = 404;
     }
   },
 
-  UPDATE_FIELD_CONFLICT: class UPDATE_FIELD_CONFLICT extends Error {
-    constructor(...args) {
-      super();
-      this.message = "El valor de este campo fue cambiado por otra persona, favor intente de nuevo.";
-      this.label = "El valor de este campo fue cambiado por otra persona, favor intente de nuevo.";
-      this.solution = "RELOAD";
-      this.name = "UPDATE_FIELD_CONFLICT";
-      this.type = "UPDATE_FIELD_CONFLICT";
-      this.status = 409;
-    }
-  },
-
-  UPDATE_LOCKED: class UPDATE_FIELD_CONFLICT extends Error {
+  INTEGRATION_ERROR: class INTEGRATION_ERROR extends Error {
     constructor(message) {
       super();
+      this.title = "Developer induced error";
       this.message = message;
-      this.label = message;
-      this.solution = "NONE";
-      this.name = "UPDATE_LOCKED";
-      this.type = "UPDATE_LOCKED";
-      this.status = 409;
-    }
-  },
-
-  INTEGRATION_ERROR: class INTEGRATION_ERROR extends Error {
-    constructor(...args) {
-      super(...args);
-      this.label =
-        "Ocurrio un en el sistema, no esta relacionado con el sistema. Comuniquese con Soporte Tecnico nivel Critico";
-      this.solution = "SUPPORT";
-      this.name = "INTEGRATION_ERROR";
       this.type = "INTEGRATION_ERROR";
       this.status = 500;
     }
   },
 
   PERMISSION_ERROR: class PERMISSION_ERROR extends Error {
-    constructor(message) {
+    constructor(type, key) {
       super();
-      this.label = message || "No tiene permiso para realizar esta acción";
-      this.solution = "ADMIN";
-      this.name = "PERMISSION_ERROR";
+      this.title = "No Permission";
+      this.message = `No ${type} permission for ${key}`;
       this.type = "PERMISSION_ERROR";
       this.status = 403;
     }
   },
 
-  AUTH_ERROR: class PERMISSION_ERROR extends Error {
-    constructor(message) {
+  AUTH_ERROR: class AUTH_ERROR extends Error {
+    constructor(message, fields) {
       super();
-      this.label = message || "No esta registrado en el sistema, sera llevado a la pagina de Login.";
+
+      this.title = "AUTH_ERROR";
+      this.message = message;
       this.solution = "ADMIN";
-      this.name = "LOGIN_ERROR";
       this.type = "LOGIN_ERROR";
       this.status = 401;
     }
   }
+};
+
+var errorCodeMap = {
+  ACTION_NO_CONTEXT: "Trying to create an action without context",
+  RELATION_NOT_FOUND:
+    "Relation {relation} can't find property {relation}Id in {table}",
+  TOO_BIG_REFERENCE: "Two levels max on query {table}",
+  ROW_IS_ARCHIVED: "{id} on {table} is archived, it can't change.",
+  VALIDATION_ERROR: "Error in {fields}",
+  OPERATION_SECURED_NO_AUTH:
+    "Operation {operation} is secure and user is not authenticated",
+  EXPIRED_TOKEN: "Token is expired, login again",
+  USER_NOT_FOUND: "User {id} not found",
+  ENFORCE_SINGLE_ROW: "Select only one row",
+  CANT_DELETE_IN_STATE: "Can't delete object in current state",
+  WRONG_STATUS: "Unexpected {expectedEstado} status"
 };

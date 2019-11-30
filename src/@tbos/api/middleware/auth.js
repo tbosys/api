@@ -23,7 +23,7 @@ module.exports = opts => {
         })
         .catch(e => {
           console.log("Auth Exception", e.stack);
-          throw new errors.AUTH_ERROR(e.label || e.message);
+          throw new errors.AUTH_ERROR(e.label || e.message, 2);
         });
     },
     after: null,
@@ -50,12 +50,6 @@ class UserModel {
       )
       .where("active", true);
 
-    //This soft limit is in place, if it's ever triggered consider changes to the authentication and user architecture. Hard limnit should be 500 users.
-    if (users.length > 100)
-      throw new errors.AUTH_ERROR(
-        "You have reached a soft user limit. Ask your team to comment line 56 of the auth middleware"
-      );
-
     const lineProfiles = await this.context.knex
       .table("profile")
       .select("profile.id", "profile.roles", "profile.name")
@@ -75,9 +69,9 @@ class UserModel {
     if (headers["authorization"]) {
       var userToken = JWT.decode(headers["authorization"]);
       const { user, users } = await this.getUserData(userToken.id);
-      if (!user) throw new errors.AUTH_ERROR("Expired Token, login again");
+      if (!user) throw new errors.AUTH_ERROR("USER_NOT_FOUND", [userToken.id]);
       if (!userToken.timestamp || !moment().isSame(userToken.timestamp, "day"))
-        throw new errors.AUTH_ERROR("Expired Token, login again");
+        throw new errors.AUTH_ERROR("EXPIRED_TOKEN");
 
       const usersMap = users.reduce(function(map, obj) {
         map[obj.id] = obj.val;

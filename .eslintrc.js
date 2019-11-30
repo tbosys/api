@@ -10,6 +10,9 @@ module.exports = {
   },
   globals: {
     rootRequire: false,
+    describe: false,
+    it: false,
+    before: false,
     rootExists: false,
     requireSchema: false,
     requireAction: false,
