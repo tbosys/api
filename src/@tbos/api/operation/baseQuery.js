@@ -1,7 +1,3 @@
-const Dinero = require("dinero.js");
-Dinero.globalLocale = "es-CR";
-Dinero.defaultPrecision = 5;
-
 const Errors = require("../errors");
 var moment = require("moment");
 var Base64URL = require("base64-url");

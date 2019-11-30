@@ -40,7 +40,7 @@ custom:
 
 provider:
   name: aws
-  runtime: nodejs8.10
+  runtime: nodejs12.x
   apiGateway:
     - ${self:custom.alias.${opt:stage, self:provider.stage}}
 
