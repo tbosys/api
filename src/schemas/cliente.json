@@ -30,6 +30,7 @@
       "$id": "/properties/ownerId",
       "type": "integer",
       "title": "Owner",
+      "table": "owner",
       "width": 300
     }
   },
@@ -39,7 +40,7 @@
     {
       "title": "Información",
       "widths": [12, 6, 3],
-      "columns": ["name", "code"]
+      "columns": ["name", "code", "ownerId"]
     }
   ]
 }

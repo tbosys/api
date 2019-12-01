@@ -14,15 +14,25 @@
     "name": {
       "$id": "/properties/name",
       "type": "string",
-      "title": "Name",
-      "default": true
+      "title": "Name"
     },
     "description": {
       "$id": "/properties/description",
       "type": "string",
       "title": "Description"
+    },
+    "roles": {
+      "$id": "/properties/roles",
+      "type": "string",
+      "isJSON": true,
+      "title": "Roles",
+      "render": "component",
+      "default": []
     }
   },
   "required": ["name"],
-  "form": [{ "title": "info", "columns": ["name"] }]
+  "form": [
+    { "title": "info", "columns": ["name"] },
+    { "title": "More", "columns": ["roles"], "widths": [12, 12, 12] }
+  ]
 }
