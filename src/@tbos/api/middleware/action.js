@@ -51,19 +51,22 @@ module.exports = opts => {
 function getOperation(operationName) {
   var Operation;
   var pathPrefix = process.cwd();
-
-  var exists = fs.existsSync(
-    path.resolve(pathPrefix, "src", "routes", operationName, "index.js")
+  var operationPath = path.resolve(
+    pathPrefix,
+    "src",
+    "routes",
+    operationName,
+    "index.js"
   );
 
-  if (exists)
-    Operation = require(path.resolve(
-      pathPrefix,
-      "src",
-      "routes",
-      operationName,
-      "index.js"
-    ));
+  if (global.systemOperations.indexOf(operationName) > -1)
+    operationPath = global.getRoot(
+      `@tbos/api/routes/${operationName}/index.js`
+    );
+
+  var exists = fs.existsSync(operationPath);
+
+  if (exists) Operation = require(operationPath);
   else
     Operation = class Op extends BaseApiOperation {
       constructor(context, user, knex) {
@@ -76,6 +79,7 @@ function getOperation(operationName) {
         return operationName;
       }
     };
+
   return Operation;
 }
 

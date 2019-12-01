@@ -5,35 +5,12 @@ const path = require("path");
 const fs = require("fs");
 var moment = require("moment-timezone");
 const middy = require("middy");
-
 moment.tz.setDefault("America/Guatemala");
 
 global.rootRequire = name => {
   const root = path.resolve(__dirname, name);
   var requiredModule = require(root);
   return requiredModule;
-};
-
-global.rootExists = name => {
-  const root = path.resolve(__dirname, name);
-  var exists = fs.existsSync(root);
-  return exists;
-};
-
-global.requireAction = (table, action) => {
-  var actionPath = path.resolve(__dirname, "routes", table, "actions", action);
-  return rootRequire(actionPath);
-};
-
-global.actionExists = (table, action) => {
-  var actionPath = path.resolve(
-    __dirname,
-    "routes",
-    table,
-    "actions",
-    action + ".js"
-  );
-  return rootExists(actionPath);
 };
 
 const EventMiddleware = rootRequire("@tbos/api/middleware/event");
@@ -63,6 +40,61 @@ Handler.use(ErrorMiddleware())
   .use(AuthMiddleware())
   .use(ConfigMiddleware())
   .use(ActionMiddleware());
+
+global.systemOperations = fs.readdirSync(
+  path.resolve(__dirname, "@tbos/api/routes")
+);
+
+global.getRoot = name => {
+  return path.resolve(__dirname, name);
+};
+
+global.rootExists = name => {
+  const root = global.getRoot(name);
+  var exists = fs.existsSync(root);
+  return exists;
+};
+
+global.requireAction = (table, action) => {
+  var actionPath;
+
+  if (global.systemOperations.indexOf(table) > -1)
+    actionPath = path.resolve(
+      __dirname,
+      "@tbos",
+      "api",
+      "routes",
+      table,
+      "actions",
+      action
+    );
+  else actionPath = path.resolve(__dirname, "routes", table, "actions", action);
+
+  return rootRequire(actionPath);
+};
+
+global.actionExists = (table, action) => {
+  var actionPath;
+  if (global.systemOperations.indexOf(table) > -1)
+    actionPath = path.resolve(
+      __dirname,
+      "@tbos",
+      "api",
+      "routes",
+      table,
+      "actions",
+      action + ".js"
+    );
+  else
+    actionPath = path.resolve(
+      __dirname,
+      "routes",
+      table,
+      "actions",
+      action + ".js"
+    );
+  return rootExists(actionPath);
+};
 
 module.exports = {
   api: Handler,

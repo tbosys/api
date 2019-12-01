@@ -1,3 +1,6 @@
+if (process.env.NODE_ENV == "development" || !process.env.NODE_ENV)
+  require("dotenv").config(); //For migrations
+
 var moment = require("moment-timezone");
 
 module.exports = {
