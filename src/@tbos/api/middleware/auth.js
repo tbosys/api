@@ -60,7 +60,11 @@ class UserModel {
       return item.id == ownerId;
     })[0];
 
-    user.roles = lineProfiles.map(item => item.roles);
+    user.roles = [];
+
+    lineProfiles.forEach(item => {
+      user.roles = user.roles.concat(JSON.parse(item.roles));
+    });
 
     return { users, user };
   }

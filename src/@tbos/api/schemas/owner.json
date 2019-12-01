@@ -33,6 +33,7 @@
       "width": 100
     },
     "profileSelector": {
+      "query": false,
       "keyAlias": "_profileOwner",
       "title": "Perfiles",
       "render": "component",

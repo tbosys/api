@@ -15,7 +15,7 @@ exports.seed = async function(knex, Promise) {
       knex,
       knex("profile").insert({
         id: 100,
-        roles: "*_*",
+        roles: { roles: ["*_*"] },
         name: "admin"
       })
     );
