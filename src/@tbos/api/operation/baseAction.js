@@ -1,10 +1,7 @@
-const _Errors = require("../errors");
 var Ajv = require("ajv");
 var localize = require("ajv-i18n");
 var Errors = require("../errors");
-// options can be passed, e.g. {allErrors: true}
 var moment = require("moment-timezone");
-var Security = require("../apiHelpers/security");
 
 class Action {
   constructor(user, knex, context) {
@@ -12,14 +9,6 @@ class Action {
     this.knex = knex;
     this.context = context;
     if (!this.context) throw new Errors.INTEGRATION_ERROR("ACTION_NO_CONTEXT");
-  }
-
-  get Errors() {
-    return _Errors;
-  }
-
-  set Errors(a) {
-    return;
   }
 
   async saveAudit(id, action, values = {}) {
@@ -41,6 +30,7 @@ class Action {
   }
 
   getOperation(table) {
+    if (table == this.table && this.operation) return this.operation;
     var Operation = this.context.getOperation(table);
     return new Operation(this.context, this.user, this.knex);
   }
@@ -67,12 +57,10 @@ class Action {
     var validate = ajv.compile(schema);
     var valid = validate(item);
     if (!valid) {
-      //localize.es(Ajv.errors);
+      localize.es(validate.errors);
       throw new Errors.VALIDATION_WITH_FIELDS_ERROR(
-        `${schema.title || schema.key} ${ajv.errorsText(validate.errors, {
-          separator: "\n"
-        })}`,
         validate.errors,
+        ajv.errorsText,
         body
       );
     }
@@ -89,56 +77,21 @@ class Action {
     return this.knex;
   }
 
-  getActionInstanceFor(table, fieldOrAction, fallback, securityChecked) {
-    var Action;
-
-    if (fallback == true) {
-      fallback = null;
-      securityChecked = true;
-    } else if (fallback == false) {
-      fallback = null;
-      securityChecked = false;
-    } else if (fallback == null) securityChecked = true;
-
-    try {
-      Action =
-        typeof fieldOrAction == "string"
-          ? requireAction(table, fieldOrAction)
-          : fieldOrAction;
-    } catch (e) {
-      if (!e.code || e.code != "MODULE_NOT_FOUND") console.log(e);
-      if (!fallback)
-        fallback = fieldOrAction.replace(/^\w/, c => c.toUpperCase());
-      Action =
-        typeof fallback == "string"
-          ? require(`./base${fallback}Action`)
-          : fallback;
-    }
-    Action.table = table;
-    var actionInstance = new Action(this.user, this.knex, this.context);
-    actionInstance.table = table;
-    actionInstance.securityChecked = securityChecked || false;
+  getActionInstanceFor(table, fieldOrAction, fallback) {
+    var thisOperation = this.getOperation(table);
+    var Action = thisOperation.getActionFor(table, fieldOrAction, fallback);
+    var actionInstance = thisOperation.getActionInstance(table, Action);
     return actionInstance;
   }
 
-  getActionAndInvoke(table, fieldOrAction, body, securityChecked) {
-    if (Action.GetActionAndInvoke)
-      return Action.GetActionAndInvoke(table, fieldOrAction, body); //For tests
-    var action = this.getActionInstanceFor(
+  getActionAndInvoke(table, actionName, body, checkSecurity) {
+    var thisOperation = this.getOperation(table);
+    return thisOperation.getActionAndInvoke(
       table,
-      fieldOrAction,
-      securityChecked
+      actionName,
+      body,
+      checkSecurity
     );
-    if (!action.securityChecked)
-      Security.checkAction(
-        this.table,
-        this.user,
-        { secure: true },
-        fieldOrAction,
-        action
-      );
-
-    return action.execute(table, body);
   }
 
   createRegistro(
@@ -181,7 +134,7 @@ class Action {
   }
 
   getMetadata(table) {
-    if (!table) table = Action.table || this.table; //dirParts[dirParts.length - 1];
+    if (!table) table = this.table; //dirParts[dirParts.length - 1];
     try {
       this._metadata = this.context.schemaMap[table];
       return this._metadata;

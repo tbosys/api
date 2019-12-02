@@ -33,11 +33,12 @@ module.exports = class DefaultCreateAction extends BaseAction {
 
   preValidate() {}
 
-  async preInsert() {}
+  async preInsert() {
+    return true;
+  }
 
   async postInsert() {
-    this.body.id = this.results[0];
-    this.results = this.body;
+    return true;
   }
 
   checkSecurity() {
@@ -66,6 +67,8 @@ module.exports = class DefaultCreateAction extends BaseAction {
       this.body.ownerId = this.user.id;
     if (this.metadata.properties.updatedAt)
       this.body.updatedAt = moment().format("YYYY-MM-DD HH:mm:ss");
+    if (this.metadata.properties.createdAt)
+      this.body.createdAt = moment().format("YYYY-MM-DD HH:mm:ss");
 
     Object.keys(this.metadata.properties).forEach(propertyKey => {
       if (
@@ -77,7 +80,7 @@ module.exports = class DefaultCreateAction extends BaseAction {
     });
   }
 
-  async create(body) {
+  async create() {
     try {
       this._ = {};
       var fields = Object.keys(this.body);
@@ -101,10 +104,10 @@ module.exports = class DefaultCreateAction extends BaseAction {
       this.checkSecurity();
 
       this.results = await this.knex.table(this.table).insert(this.body);
-      await this.postInsert();
-      await this.saveAudit(this.body.id, "create", this.body);
 
-      return this.results;
+      await this.postInsert();
+      await this.saveAudit(this.results[0], "create", this.body);
+      return { id: this.results[0] };
     } catch (e) {
       if (e.code == "ER_DUP_ENTRY")
         throw new Errors.DUPLICATE_ERROR(e, this.body);

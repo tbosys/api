@@ -30,12 +30,14 @@ module.exports = opts => {
 
       handler.context.userAgent = {};
 
-      if (handler.context.headers["x-forwarded-for"]) {
-        var ipValues = handler.context.headers["x-forwarded-for"].split(",");
-        handler.context.headers.ip = (ipValues.pop() || "").trim();
-      } else {
-        handler.context.headers.ip = event.requestContext.identity.sourceIp;
-      }
+      try {
+        if (handler.context.headers["x-forwarded-for"]) {
+          var ipValues = handler.context.headers["x-forwarded-for"].split(",");
+          handler.context.headers.ip = (ipValues.pop() || "").trim();
+        } else {
+          handler.context.headers.ip = event.requestContext.identity.sourceIp;
+        }
+      } catch (e) {}
 
       handler.context.parts = getParts(event.path);
 

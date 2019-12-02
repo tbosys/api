@@ -63,7 +63,7 @@ class UserModel {
     user.roles = [];
 
     lineProfiles.forEach(item => {
-      user.roles = user.roles.concat(JSON.parse(item.roles));
+      user.roles = user.roles.concat(item.roles);
     });
 
     return { users, user };

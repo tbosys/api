@@ -15,7 +15,8 @@ exports.seed = async function(knex, Promise) {
       knex,
       knex("profile").insert({
         id: 100,
-        roles: '["*_*"]',
+        // eslint-disable-next-line quotes
+        roles: `["*_*"]`,
         name: "admin"
       })
     );

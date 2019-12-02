@@ -69,7 +69,9 @@ module.exports = class DefaultUpdateAction extends BaseAction {
 
   preValidate() {}
 
-  async preUpdate() {}
+  async preUpdate() {
+    return true;
+  }
 
   async postUpdate() {
     return true;
@@ -127,32 +129,9 @@ module.exports = class DefaultUpdateAction extends BaseAction {
 
       await this.saveAudit(this.body.id, "update", simpleBody);
 
-      var final = await this.knex
-        .table(this.table)
-        .select()
-        .where("id", this.body.id)
-        .first();
+      await this.postUpdate();
 
-      await this.postUpdate(final);
-
-      var columnKeys = Object.keys(this.metadata.properties);
-
-      let keys = Object.keys(final);
-      keys.forEach(key => {
-        if (final[key] == null) delete final[key];
-      });
-
-      columnKeys.forEach(columnKey => {
-        if (this.metadata.properties[columnKey].isJSON) {
-          if (final[columnKey]) {
-            final[columnKey] = JSON.parse(final[columnKey]);
-          } else {
-            final[columnKey] = [];
-          }
-        }
-      });
-
-      return this.result;
+      return { id: this.body.id };
     } catch (e) {
       if (e.code == "ER_DUP_ENTRY")
         throw new Errors.DUPLICATE_ERROR(e, this.body);

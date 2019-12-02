@@ -13,6 +13,18 @@ class AprobarAction extends BaseAction {
   }
 }
 
+class ActionA extends BaseAction {
+  async execute(table, body) {
+    return this.getActionAndInvoke("other table", ActionB, body, body.secure);
+  }
+}
+
+class ActionB extends BaseAction {
+  async execute(table, body) {
+    return "ActionB";
+  }
+}
+
 class ErrorAction extends BaseAction {
   async execute(table, body) {
     throw new Errors.SERVER_ERROR("error");
@@ -28,6 +40,40 @@ describe("Base Action", () => {
   it("Validate", async function() {
     var response = await Execute({ ids: true }, "ping", AprobarAction);
     return response.should.be.false;
+  });
+
+  it("Invoking Actions", async function() {
+    var response = await Execute({ ids: true }, "pingA", ActionA);
+    return response.should.equal("ActionB");
+  });
+
+  it("Invoking Actions with Permission Check", async function() {
+    try {
+      var response = await Execute(
+        { ids: true, secure: true },
+        "pingA",
+        ActionA,
+        {
+          id: 1,
+          roles: ["pingA_ActionA"],
+          name: "Test User",
+          shareLevel: 1
+        }
+      );
+    } catch (e) {
+      e.type.should.equal("PERMISSION_ERROR");
+      return true;
+    }
+  });
+
+  it("Invoking Actions witouth Permission Check", async function() {
+    var response = await Execute({ ids: true }, "pingA", ActionA, {
+      id: 1,
+      roles: ["pingA_ActionA"],
+      name: "Test User",
+      shareLevel: 1
+    });
+    return response.should.equal("ActionB");
   });
 
   it("Error", async function() {

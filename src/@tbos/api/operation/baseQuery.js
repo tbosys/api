@@ -98,10 +98,6 @@ class ApiOperation {
       if (this._postQuery) this._postQuery(result);
 
       columnKeys.forEach(columnKey => {
-        if (metadata.properties[columnKey].isJSON && result[columnKey]) {
-          console.log(result[columnKey]);
-          result[columnKey] = JSON.parse(result[columnKey]);
-        }
         if (metadata.properties[columnKey].isCSV && result[columnKey]) {
           result[columnKey] = result[columnKey].split(",");
         }
@@ -145,30 +141,6 @@ class ApiOperation {
       } catch (e) {
         console.log(e);
       }
-    }
-
-    if (body.filterName) {
-      var view = await this.knex
-        .table("tableView")
-        .first()
-        .where({ name: body.filterName, table: this.table });
-      if (view)
-        await this.knex
-          .table("tableView")
-          .update({
-            type: body.type || "table",
-            filters: JSON.stringify(body.filters),
-            columns: JSON.stringify(body.columns || [])
-          })
-          .where("id", "=", view.id);
-      else
-        await this.knex.table("tableView").insert({
-          name: body.filterName,
-          type: body.type || "table",
-          table: this.table,
-          filters: JSON.stringify(body.filters),
-          columns: JSON.stringify(body.columns || [])
-        });
     }
 
     var results = await this._query(body, doNotCheckSecurity);

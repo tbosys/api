@@ -28,14 +28,18 @@ module.exports = opts => {
 
       var method = operation[handler.context.parts.methodName];
       if (!method) {
-        var action = operation.checkAction(handler.context.parts.methodName);
-        if (!action)
+        var Action = operation.getActionFor(
+          operation.table,
+          handler.context.parts.methodName,
+          false
+        );
+        if (!Action)
           throw new Error(
             "[402] no se encontro el metodo " + handler.context.parts.methodName
           );
         method = operation.executeAction(
           handler.context.parts.methodName,
-          action
+          Action
         );
       }
       handler.context.method = method;

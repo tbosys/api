@@ -34,13 +34,18 @@ class ApiOperation {
 
   async _destroy(body) {
     if (body.ids[0] == null) throw new Errors.INVALID_ERROR("No rows selected");
+    var _knex = this.knex;
 
     var trx = await this.knex.transaction();
     try {
+      this.knex = trx;
+
       var current = await this.one({ id: body.ids[0] });
       var metadata = this.getMetadata();
       var Action = this.getActionFor(this.table, "destroy", "Destroy");
       var action = new Action(this.user, trx, this.context);
+      action.operation = this;
+      action.table = this.table;
       var resultBody = await action.execute(
         this.table,
         body,
@@ -48,9 +53,13 @@ class ApiOperation {
         metadata
       );
       await trx.commit();
+      this.knex = _knex;
+
       return resultBody;
     } catch (e) {
       await trx.rollback();
+      this.knex = _knex;
+
       throw e;
     }
   }
@@ -60,19 +69,26 @@ class ApiOperation {
   }
 
   async _update(body) {
+    var _knex = this.knex;
+
     if (!body.id) throw new Errors.VALIDATION_ERROR(["id"]);
 
     var trx = await this.knex.transaction();
     try {
+      this.knex = trx;
+
       var Action = this.getActionFor(this.table, "update", "Update");
       var action = new Action(this.user, trx, this.context);
+      action.table = this.table;
+      action.operation = this;
       body = this.preUpdateHook(body);
       var resultBody = await action.execute(this.table, body);
-      var one = this.one(body);
       await trx.commit();
-      return one;
+      this.knex = _knex;
+      return this.getOne({ filters: [["id", "=", resultBody.id]] });
     } catch (e) {
       await trx.rollback();
+      this.knex = _knex;
       throw e;
     }
   }
@@ -82,130 +98,23 @@ class ApiOperation {
     return this._update(body);
   }
 
-  batchCount(body) {
-    var metadata = this.getMetadata();
-
-    var knexOperation = this.knex(this.table).count(
-      metadata.key + ".id as count"
-    );
-    var parsedFields = [];
-    knexOperation = this.processQueryFilter(knexOperation, body);
-
-    if (metadata.belongsTo && metadata.belongsTo.length > 0) {
-      var joins = [];
-
-      metadata.belongsTo.forEach(relation => {
-        if (relation.indexOf(">") > -1) {
-          var parts = relation.split(">");
-          joins.push([
-            parts[1],
-            `${parts[1]}.id`,
-            `${[parts[0]]}.${parts[1]}Id`
-          ]);
-          //var fieldOps = metadata.properties[`${parts[1]}Id`] ? metadata.properties[`${parts[1]}Id`] : {};
-          //if (fieldOps.fields) fieldOps.fields.forEach((relatedFieldArray) => {
-          //            parsedFields.push(`${parts[1]}.${relatedFieldArray[0]} as ${relatedFieldArray[1]}`)
-          //        })
-        } else {
-          var fieldOps = metadata.properties[`${relation}Id`]
-            ? metadata.properties[`${relation}Id`]
-            : {};
-          var alias = fieldOps.tableAlias || relation;
-          joins.push([
-            `${relation} as ${alias}`,
-            `${alias}.id`,
-            `${this.table}.${relation}Id`
-          ]);
-        }
-      });
-
-      joins.forEach(function(join) {
-        knexOperation = knexOperation.leftJoin(join[0], join[1], join[2]);
-      });
-    }
-    return knexOperation.then(res => {
-      if (res[0]) return res[0].count;
-      else return 0;
-    });
-  }
-
-  batch(body) {
-    var metadata = this.getMetadata();
-
-    var update = {};
-    Object.keys(body.update).forEach(key => {
-      update[`${metadata.key}.${key}`] = body.update[key];
-    });
-
-    var knexOperation = this.knex(this.table).update(update);
-
-    knexOperation = this.processQueryFilter(knexOperation, body);
-
-    if (metadata.belongsTo && metadata.belongsTo.length > 0) {
-      var joins = [];
-
-      metadata.belongsTo.forEach(relation => {
-        if (relation.indexOf(">") > -1) {
-          var parts = relation.split(">");
-          joins.push([
-            parts[1],
-            `${parts[1]}.id`,
-            `${[parts[0]]}.${parts[1]}Id`
-          ]);
-          //var fieldOps = metadata.properties[`${parts[1]}Id`] ? metadata.properties[`${parts[1]}Id`] : {};
-          //if (fieldOps.fields) fieldOps.fields.forEach((relatedFieldArray) => {
-          //parsedFields.push(`${parts[1]}.${relatedFieldArray[0]} as ${relatedFieldArray[1]}`)
-          //})
-        } else {
-          var fieldOps = metadata.properties[`${relation}Id`]
-            ? metadata.properties[`${relation}Id`]
-            : {};
-          var alias = fieldOps.tableAlias || relation;
-          joins.push([
-            `${relation} as ${alias}`,
-            `${alias}.id`,
-            `${this.table}.${relation}Id`
-          ]);
-        }
-      });
-
-      joins.forEach(function(join) {
-        knexOperation = knexOperation.leftJoin(join[0], join[1], join[2]);
-      });
-    }
-    return knexOperation;
-  }
-
-  executeAction(actionName, Action) {
-    return async body => {
-      var trx = await this.knex.transaction();
-      try {
-        var action = new Action(this.user, trx, this.context);
-        action.table = this.table;
-        Security.checkAction(this.table, this.user, Action, actionName, action);
-
-        var resultBody = await action.execute(this.table, body);
-        await trx.commit();
-        return resultBody;
-      } catch (e) {
-        console.log(e);
-        await trx.rollback();
-        throw e;
-      }
-    };
-  }
-
   async _create(body) {
+    var _knex = this.knex;
     var trx = await this.knex.transaction();
     try {
       var Action = this.getActionFor(this.table, "create", "Create");
+      this.knex = trx;
       var action = new Action(this.user, trx, this.context);
+      action.operation = this;
+      action.table = this.table;
       var resultBody = await action.execute(this.table, body);
       await trx.commit();
-      return resultBody;
+      this.knex = _knex;
+      return this.getOne({ filters: [["id", "=", resultBody.id]] });
     } catch (e) {
       console.log(e);
       await trx.rollback();
+      this.knex = _knex;
       throw e;
     }
   }
@@ -214,51 +123,9 @@ class ApiOperation {
     return this._create(body);
   }
 
-  async _aprobar(body) {
-    var trx = await this.knex.transaction();
-    try {
-      var Action = this.getActionFor(this.table, "aprobar", "Aprobar");
-      var action = new Action(this.user, trx, this.context);
-      Security.checkAction(this.table, this.user, Action, "aprobar", action);
-
-      var resultBody = await action.execute(this.table, body);
-      await trx.commit();
-      return resultBody;
-    } catch (e) {
-      console.log(e);
-      await trx.rollback();
-      throw e;
-    }
-  }
-
-  aprobar(body) {
-    return this._aprobar(body);
-  }
-
-  async _aplicar(body) {
-    var trx = await this.knex.transaction();
-    try {
-      var Action = this.getActionFor(this.table, "aplicar", "Aplicar");
-      var action = new Action(this.user, trx, this.context);
-      Security.checkAction(this.table, this.user, Action, "aplicar", action);
-      var resultBody = await action.execute(this.table, body);
-      await trx.commit();
-      return resultBody;
-    } catch (e) {
-      console.log(e);
-      await trx.rollback();
-      throw e;
-    }
-  }
-
-  aplicar(body) {
-    return this._aplicar(body);
-  }
-
   getExternalMetadata(key) {
     try {
       var metadata = this.context.schemaMap[key];
-      metadata = this.validateMetadata(this._metadata);
       return metadata;
     } catch (e) {
       console.log(e);
@@ -270,108 +137,11 @@ class ApiOperation {
     if (this._metadata) return this._metadata;
     try {
       this._metadata = this.context.schemaMap[this.schema || this.table];
-      this._metadata = this.validateMetadata(this._metadata);
       return this._metadata;
     } catch (e) {
       console.log(e);
       throw new Errors.ITEM_NOT_FOUND(this.table, "metadata");
     }
-  }
-
-  validateMetadata(metadata) {
-    if (metadata.actions)
-      metadata.actions = metadata.actions.map(action => {
-        const mapThenActions = { Borrar: "confirm", Imprimir: "openUrl" };
-        var validAction = {
-          title: action.title || action,
-          key: action.key,
-          constraint: action.constraint, // single, multiple,
-          type: action.type || "checkButton", // modal || checkButton || actionButton
-          then: action.then || mapThenActions[action.title] || "reload", // reload || "confirm" || openUrl
-          icon: action.icon || action.title || action,
-          subscribe: action.subscribe || null
-        };
-        return validAction;
-      });
-    else metadata.actions = [];
-    Object.keys(metadata.properties).forEach(key => {
-      metadata.properties[key].key = key;
-    });
-    return metadata;
-  }
-
-  getFields(as) {
-    var metadata = this.getMetadata();
-    if (as == "keys") return Object.keys(metadata.properties);
-    if (as == "array") {
-      var fields = [];
-      Object.keys(metadata.properties).map(function(propertyName) {
-        var property = metadata.properties[propertyName];
-        property.key = propertyName;
-        if (!property.excludeFromQuery) fields.push(property);
-      });
-      return fields;
-    }
-    return metadata.properties;
-  }
-
-  async metadata(body) {
-    var metadata = this.getMetadata();
-    var item = null;
-    var recent = null;
-
-    if (this.context.headers.referer) {
-      var referer = this.context.headers.referer;
-      var realReferer =
-        referer.lastIndexOf("/") == referer.length - 1
-          ? referer.substr(0, referer.length - 1)
-          : referer.substr(0);
-      var refererParts = realReferer.split("/");
-      referer = refererParts[refererParts.length - 2];
-    }
-
-    metadata.count = (await this.knex(this.table).count("id as id"))[0].id;
-
-    if (body.id && parseInt(body.id) >= 0) item = await this.one(body);
-    else if (body.inProgress)
-      recent = await this.query(
-        this.getQueryForInProgress() || { inProgress: true }
-      );
-    else if (body.relatedTo)
-      recent = await this.query({
-        filters: [[body.relatedTo, "=", body.relatedId]]
-      });
-    else if (body.filters) recent = await this.query(body);
-
-    metadata.user = this.user;
-    metadata.item = item;
-    metadata.recent = recent;
-
-    if (recent) {
-      var reports = await this.knex
-        .table("reporte")
-        .select()
-        .where("table", this.table);
-      metadata.reports = reports.map(item => {
-        return {
-          ...item,
-          fields: JSON.parse(item.fields || "[]"),
-          sums: JSON.parse(item.sums || "[]"),
-          sort: JSON.parse(item.sort || "[]"),
-          groups: JSON.parse(item.groups || "[]"),
-          filters: JSON.parse(item.filters || "[]")
-        };
-      });
-    }
-
-    if (metadata.tableOverride && metadata.tableOverride[referer])
-      metadata.table = metadata.tableOverride[referer];
-
-    return this.postMetadata(metadata);
-  }
-
-  async postMetadata(metadata) {
-    return metadata;
   }
 
   async one(body) {
@@ -384,10 +154,6 @@ class ApiOperation {
     else if (!results || !results[0] || !results[0].id)
       throw new Errors.ITEM_NOT_FOUND(this.table, body.id);
     return results[0];
-  }
-
-  checkAction(name) {
-    return this.getActionFor(this.table, name, false);
   }
 
   allWithName(body) {
@@ -404,610 +170,93 @@ class ApiOperation {
     return this.query({ filters: filters, limit: 10 }, true);
   }
 
-  getQueryForInProgress() {
-    return null;
-  }
-
-  async postQuery(allItems, body) {
-    var keys;
-    var metadata = this.getMetadata();
-    var columnKeys = Object.keys(metadata.properties);
-
-    let items = allItems.filter(result => {
-      if (!keys) keys = Object.keys(result);
-      keys.forEach(key => {
-        if (result[key] == null) delete result[key];
-      });
-
-      if (this._postQuery) this._postQuery(result);
-
-      columnKeys.forEach(columnKey => {
-        if (metadata.properties[columnKey].isJSON && result[columnKey]) {
-          result[columnKey] = JSON.parse(result[columnKey]);
-        }
-      });
-
-      if (metadata.properties.ownerId) {
-        if (metadata.shareLevel) {
-          if ((this.user.nivel || 100) >= metadata.shareLevel)
-            return result.ownerId == this.user.id;
-          //If owner is me, then filter true else false.
-          else return true; // in case nivel user < 5 then return true
-        }
-      }
-      return true;
-    });
-
-    if (body.filterOwnerName && body.filterOwnerName.length > 0) {
-      items = items.filter(item => {
-        var ownerName = item.__ownerId || "";
-        return (
-          ownerName.toLowerCase().indexOf(body.filterOwnerName.toLowerCase()) >
-          -1
-        );
-      });
-    }
-
-    if (metadata.sort)
-      items.sort(function(a, b) {
-        if (a[metadata.sort] > b[metadata.sort]) return 1;
-        if (a[metadata.sort] < b[metadata.sort]) return -1;
-        return 0;
-      });
-
-    return items;
-  }
-
   async get(body) {
     var Query = new BaseQuery(this.context, this.user, this.knex, this.table);
     return Query.query(body);
   }
 
-  async query(body, doNotCheckSecurity) {
-    var metadata = this.getMetadata();
-
-    var results = await this._query(body, doNotCheckSecurity);
-
-    results = await this.postQuery(results, body);
-
-    if (
-      results.length > 0 &&
-      metadata.restrictedQuery &&
-      metadata.restrictedQuery.length > -1
-    ) {
-      var fields = Object.keys(results[0]);
-      results = results.map(result => {
-        fields.forEach(field => {
-          if (metadata.restrictedQuery.indexOf(field) > -1) {
-            var restricted = Security.checkQueryField(
-              this.table,
-              this.user,
-              field
-            );
-            if (restricted) delete result[field];
-          }
-        });
-        return result;
-      });
-    }
-
-    return results;
+  async getOne(body) {
+    var Query = new BaseQuery(this.context, this.user, this.knex, this.table);
+    var queryResult = await Query.query(body);
+    return queryResult.edges[0];
   }
 
-  _query(body, doNotCheckSecurity = false) {
-    var metadata = this.getMetadata();
-    var isSecure = metadata.secure || true;
-    if (doNotCheckSecurity == false && isSecure)
-      Security.checkQuery(this.table, this.user);
+  executeAction(actionName, Action) {
+    var _knex = this.knex;
+    return async body => {
+      var trx = await this.knex.transaction();
 
-    var knexOperation = this.knex(this.table);
-    knexOperation = this.getSelectQuery(knexOperation, body);
-    knexOperation = this.toMultiTenantQuery(knexOperation);
+      try {
+        this.knex = trx;
+        var action = new Action(this.user, this.knex, this.context);
+        action.operation = this;
+        action.table = this.table;
+        Security.checkAction(this.table, this.user, Action, actionName, action);
 
-    var statusField = metadata.statusField;
-
-    knexOperation = this.processQueryFilter(knexOperation, body);
-    if (body.id)
-      knexOperation = knexOperation.where({ [`${this.table}.id`]: body.id });
-    if (body.inProgress && metadata.properties[statusField])
-      knexOperation = knexOperation.whereNot(
-        `${this.table}.${statusField}`,
-        "archivado"
-      );
-
-    if (
-      !body.fromOne &&
-      metadata.properties.activo &&
-      JSON.stringify(body.filters || "").indexOf("activo") == -1 &&
-      body.source != "edit"
-    )
-      knexOperation = knexOperation.where(
-        metadata.properties.activo.select || `${this.table}.activo`,
-        1
-      );
-
-    //TODO FIX THIS
-    if (body.order) knexOperation = knexOperation.orderBy(body.order, "ASC");
-    else if (metadata.properties[statusField]) {
-      var enumList = metadata.properties[metadata.statusField].enum;
-      var order = `FIELD(${this.table}.statusFields, ${enumList
-        .map(item => `"${item}"`)
-        .join(",")} ) ASC`;
-      knexOperation = knexOperation.orderByRaw(order);
-    } else if (metadata.orderBy)
-      knexOperation = knexOperation.orderBy(
-        metadata.orderBy[0],
-        metadata.orderBy[1]
-      );
-
-    if (body.limit) knexOperation = knexOperation.limit(body.limit);
-    else {
-      if (!body.inProgress && !body.limitless)
-        knexOperation = knexOperation.limit(2000);
-
-      if (
-        body.inProgress &&
-        !body.limitless &&
-        !metadata.properties[metadata.statusField]
-      )
-        knexOperation = knexOperation.limit(metadata.limit || 100);
-    }
-    //console.log(knexOperation.toString());
-    return knexOperation;
-  }
-
-  groupBy(body) {
-    var metadata = this.getMetadata();
-    var isSecure = metadata.secure || true;
-    Security.checkQuery(this.table, this.user);
-
-    var knexOperation = this.knex(this.table);
-    knexOperation = this.getSumQuery(knexOperation, body);
-
-    knexOperation = this.processQueryFilter(knexOperation, body);
-    if (body.id)
-      knexOperation = knexOperation.where({ [`${this.table}.id`]: body.id });
-    if (body.inProgress && metadata.properties[metadata.statusField])
-      knexOperation = knexOperation.whereNot(
-        `${this.table}.${metadata.statusField}`,
-        "archivado"
-      );
-
-    if (
-      metadata.properties.activo &&
-      JSON.stringify(body.filters || "").indexOf("activo") == -1
-    )
-      knexOperation = knexOperation.where(
-        metadata.properties.activo.select || `${this.table}.activo`,
-        1
-      );
-    console.log(knexOperation.toString());
-
-    //TODO FIX THIS
-    //if (body.order) knexOperation = knexOperation.orderBy(body.order, "DESC");
-
-    //if (!body.inProgress && !body.limitless) knexOperation = knexOperation.limit(100);
-
-    return knexOperation;
-  }
-
-  parseAsField(field) {
-    var parts = field.split(".");
-    return parts[parts.length - 1];
-  }
-
-  parseField(field) {
-    var metadata = this.getMetadata();
-    if (field.indexOf(".") == -1) return `${metadata.key}.${field}`;
-    return field;
-  }
-
-  getSumQuery(knexOperation, body) {
-    var metadata = this.getMetadata();
-    if (body.sumFields)
-      knexOperation = knexOperation.sum(
-        `${this.parseField(body.sumFields)} as ${this.parseAsField(
-          body.sumFields
-        )}`
-      );
-    else if (body.count) {
-      knexOperation = knexOperation.count(`${this.parseField("id")} as count`);
-    } else throw new Errors.VALIDATION_ERROR(["sumFields"]);
-    var parsedGroupBy = [];
-    var parsedSelect = [];
-    if (!body.groupBy) body.groupBy = [];
-    body.groupBy.forEach(groupFieldBy => {
-      var fieldOptions = metadata.properties[groupFieldBy];
-      var groupBy;
-      if (!fieldOptions) groupBy = groupFieldBy;
-      else if (fieldOptions.select) {
-        groupBy = fieldOptions.select;
-      } else if (fieldOptions.metadataType) {
-        groupBy = `${fieldOptions.metadataType}.${
-          fieldOptions.elementOptions
-            ? fieldOptions.elementOptions.primary
-            : "name"
-        }`;
-      } else groupBy = groupFieldBy;
-      parsedGroupBy.push(groupBy);
-      parsedSelect.push(
-        `${this.parseField(groupBy)} as ${this.parseAsField(groupFieldBy)}`
-      );
-    });
-
-    if (body.dateGroup && body.dateGroup.length > 2) {
-      var parts = body.dateGroup.split("-");
-      var dateField = `${metadata.key}.${parts[0]}`;
-      var groupType = parts[1];
-      var dateGroup;
-      if (groupType == "mes") dateGroup = `DATE_FORMAT(${dateField}, '%Y-%m')`;
-      else if (groupType == "año") dateGroup = `YEAR(${dateField})`;
-      else if (groupType == "semana") dateGroup = `YEARWEEK(${dateField})`;
-      else if (groupType == "día")
-        dateGroup = `DATE_FORMAT(${dateField}, '%Y-%m-%d')`;
-      if (process.env.NODE_ENV != "development")
-        knexOperation = knexOperation.orderBy(dateField, "ASC");
-      parsedGroupBy.push(dateGroup);
-      parsedSelect.push(
-        `${this.parseField(dateGroup)} as ${this.parseAsField(groupType)}`
-      );
-    }
-    var joins = [];
-    if (metadata.belongsTo && metadata.belongsTo.length > 0) {
-      metadata.belongsTo.forEach(relation => {
-        if (relation.indexOf(">") > -1) {
-          var parts = relation.split(">");
-          joins.push([
-            parts[1],
-            `${parts[1]}.id`,
-            `${[parts[0]]}.${parts[1]}Id`
-          ]);
-        } else if (relation.indexOf("[") > -1) {
-          var parts = relation.split("[");
-          var key = parts[1].replace("]", "");
-          joins.push([
-            parts[0],
-            `${parts[0]}.${key}`,
-            `${[metadata.key]}.${key}`
-          ]);
-        } else {
-          joins.push([
-            relation,
-            `${relation}.id`,
-            `${[metadata.key]}.${relation}Id`
-          ]);
-        }
-      });
-    }
-
-    joins.forEach(function(join) {
-      knexOperation = knexOperation.leftJoin(join[0], join[1], join[2]);
-    });
-
-    knexOperation = knexOperation
-      .select(this.knex.raw(parsedSelect.join(",")))
-      .groupBy(this.knex.raw(parsedGroupBy.join(",")));
-
-    console.log(knexOperation.toString());
-
-    return knexOperation;
-  }
-
-  getSelectQuery(knexOperation, body) {
-    var metadata = this.getMetadata();
-    var fields = body.fields || this.getFields("array");
-    var parsedFields = [];
-
-    if (metadata.properties.ownerId) fields.push("ownerId");
-    parsedFields = fields
-      .filter(field => {
-        if (field.query == false) return false;
-
-        return true;
-      })
-      .map(field => {
-        var fieldName = field.key;
-        if (!fieldName && typeof field == "string") fieldName = field;
-        if (field.select)
-          return this.knex.raw(`${field.select} as ${fieldName}`);
-        return `${this.table}.${fieldName}`;
-      });
-    var joins = [];
-    if (metadata.belongsTo && metadata.belongsTo.length > 0) {
-      metadata.belongsTo.forEach(relation => {
-        if (relation.indexOf(">") > -1) {
-          var parts = relation.split(">");
-          joins.push([
-            parts[1],
-            `${parts[1]}.id`,
-            `${[parts[0]]}.${parts[1]}Id`
-          ]);
-          var fieldOps = metadata.properties[`${parts[1]}Id`]
-            ? metadata.properties[`${parts[1]}Id`]
-            : {};
-          if (fieldOps.fields)
-            fieldOps.fields.forEach(relatedFieldArray => {
-              parsedFields.push(
-                `${parts[1]}.${relatedFieldArray[0]} as ${relatedFieldArray[1]}`
-              );
-            });
-        } else if (relation.indexOf("[") > -1) {
-          var parts = relation.split("[");
-          var key = parts[1].replace("]", "");
-          joins.push([
-            parts[0],
-            `${parts[0]}.${key}`,
-            `${[metadata.key]}.${key}`
-          ]);
-          var fieldOps = metadata.properties[`${parts[0]}Id`]
-            ? metadata.properties[`${parts[0]}Id`]
-            : {};
-          if (fieldOps.fields)
-            fieldOps.fields.forEach(relatedFieldArray => {
-              parsedFields.push(
-                `${parts[0]}.${relatedFieldArray[0]} as ${relatedFieldArray[1]}`
-              );
-            });
-        } else {
-          var names = [];
-          var fieldOps = metadata.properties[`${names[0]}Id`];
-          if (relation.indexOf("[") > -1) {
-            var parts = relation.replace("]", "").split("[")[1];
-            names = parts.split(",");
-            fieldOps = metadata.properties[`${names[0]}`];
-          } else {
-            names = [relation];
-            fieldOps = metadata.properties[`${names[0]}Id`];
-          }
-
-          var alias = fieldOps.tableAlias || fieldOps.table;
-          if (fieldOps.fields)
-            fieldOps.fields.forEach(relatedFieldArray => {
-              parsedFields.push(
-                `${alias}.${relatedFieldArray[0]} as ${relatedFieldArray[1]}`
-              );
-            });
-          else {
-            names.forEach(name => {
-              var adjustedName =
-                name.indexOf("Id") > -1 ? `__${name}` : `__${name}Id`;
-              parsedFields.push(`${alias}.name as ${adjustedName}`);
-            });
-          }
-          names.forEach(name => {
-            var adjustedName =
-              name.indexOf("Id") > -1 ? `${name}` : `${name}Id`;
-
-            joins.push([
-              `${fieldOps.table} as ${alias}`,
-              `${alias}.id`,
-              `${this.table}.${adjustedName}`
-            ]);
-          });
-        }
-      });
-
-      knexOperation = knexOperation.select(parsedFields);
-      knexOperation.selectFields = parsedFields;
-      joins.forEach(function(join) {
-        knexOperation = knexOperation.leftJoin(join[0], join[1], join[2]);
-      });
-    } else {
-      knexOperation = knexOperation.select(parsedFields);
-      knexOperation.selectFields = parsedFields;
-    }
-
-    if (metadata.belongsIn && metadata.belongsIn.length > 0) {
-      metadata.belongsIn.forEach(relation => {
-        knexOperation = knexOperation.leftJoin(
-          relation,
-          `${relation}.${metadata.key}Id`,
-          `${[metadata.key]}.id`
-        );
-      });
-    }
-    return knexOperation;
-  }
-
-  processQueryFilter(knexOperation, body) {
-    if (!body.filter && !body.filters) return knexOperation;
-
-    if (body.filters) return this.proccessArrayFilters(knexOperation, body);
-    var keys = Object.keys(body.filter);
-    if (keys.length == 0) return knexOperation;
-
-    if (!body.filter[keys[0]].column)
-      return this.processDirectFilter(knexOperation, body, keys);
-    else return this.processTableFilter(body);
-  }
-
-  processDirectFilter(knexOperation, body) {
-    return knexOperation.where(body.filter);
-  }
-
-  proccessArrayFilters(knexOperation, body) {
-    var metadata = this.getMetadata();
-
-    body.filters.forEach(filter => {
-      if (filter[0].indexOf("ownerId") > -1)
-        return (body.filterOwnerName = filter[2]);
-      var parts = filter[0].split(".");
-      var key = parts[1] || parts[0];
-      var column = metadata.properties[key];
-      if (parts[1] && metadata.key == parts[0])
-        column = metadata.key == parts[0];
-      else if (parts[1]) {
-        var otherMetadata = this.getExternalMetadata(parts[0]);
-        column = otherMetadata[key];
+        var resultBody = await action.execute(this.table, body);
+        await trx.commit();
+        this.knex = _knex;
+        return resultBody;
+      } catch (e) {
+        console.log(e);
+        await trx.rollback();
+        this.knex = _knex;
+        throw e;
       }
-
-      if (column && column.excludeFromQuery) return;
-      else if (column && column.select)
-        knexOperation.whereRaw(`${column.select} ${filter[1]} ?`, filter[2]);
-      else if (filter[1] == "FIXED") {
-        var dates = this.getFixedDates(filter[2]);
-        knexOperation.whereBetween(filter[0], dates);
-      } else if (filter[1] == "FIND_IN_SET")
-        knexOperation.where(
-          this.knex.raw(`FIND_IN_SET('${filter[2]}',${filter[0]})`)
-        );
-      else knexOperation.where(filter[0], filter[1], filter[2]);
-    });
-    console.log(knexOperation.toString());
-    return knexOperation;
+    };
   }
 
-  getFixedDates(fixedType) {
-    var betweens = [];
-    var current_fiscal_year_start,
-      current_fiscal_year_end,
-      last_fiscal_year_start,
-      last_fiscal_year_end;
-
-    if (moment().quarter() == 4) {
-      current_fiscal_year_start = moment()
-        .month("October")
-        .startOf("month");
-      current_fiscal_year_end = moment()
-        .add("year", 1)
-        .month("September")
-        .endOf("month");
-      last_fiscal_year_start = moment()
-        .subtract("year", 1)
-        .month("October")
-        .startOf("month");
-      last_fiscal_year_end = moment()
-        .month("September")
-        .endOf("month");
-    } else {
-      current_fiscal_year_start = moment()
-        .subtract("year", 1)
-        .month("October")
-        .startOf("month");
-      current_fiscal_year_end = moment()
-        .month("September")
-        .endOf("month");
-      last_fiscal_year_start = moment()
-        .subtract("year", 2)
-        .month("October")
-        .startOf("month");
-      last_fiscal_year_end = moment()
-        .subtract("year", 1)
-        .month("September")
-        .endOf("month");
-    }
-
-    if (fixedType == "HOY") betweens = [moment(), moment()];
-    else if (fixedType == "AYER")
-      betweens = [moment().add(-1, "day"), moment().add(-1, "day")];
-    else if (fixedType == "CICLO")
-      betweens = [moment().add(-1, "month"), moment()];
-    else if (fixedType == "ESTA SEMANA")
-      betweens = [moment().startOf("week"), moment()];
-    else if (fixedType == "ESTE MES")
-      betweens = [moment().startOf("month"), moment()];
-    else if (fixedType == "ESTE AÑOF")
-      betweens = [current_fiscal_year_start, current_fiscal_year_end];
-    else if (fixedType == "ULTIMO MES")
-      betweens = [
-        moment()
-          .startOf("month")
-          .add(-1, "month"),
-        moment()
-          .startOf("month")
-          .add(-1, "day")
-      ];
-    else if (fixedType == "12 SEMANAS")
-      betweens = [
-        moment()
-          .startOf("week")
-          .add(-12, "week"),
-        moment()
-      ];
-    else if (fixedType == "16 SEMANAS")
-      betweens = [
-        moment()
-          .startOf("week")
-          .add(-16, "week"),
-        moment()
-      ];
-    else if (fixedType == "6 MESES")
-      betweens = [
-        moment()
-          .startOf("month")
-          .add(-6, "month"),
-        moment()
-      ];
-    else if (fixedType == "12 MESES")
-      betweens = [
-        moment()
-          .startOf("month")
-          .add(-12, "month"),
-        moment()
-      ];
-    else if (fixedType == "ULTIMO AÑOF")
-      betweens = [last_fiscal_year_start, last_fiscal_year_end];
-
-    return [
-      betweens[0].format("YYYY-MM-DD 00:00:00"),
-      betweens[1].format("YYYY-MM-DD 23:59:59")
-    ];
-  }
-
-  processTableFilter(knexOperation, body, keys) {
-    keys.forEach(function(key) {
-      var column = body.filter[key].column;
-      if (column.excludeFromQuery) return;
-      else if (column) {
-        if (column.filter == "LIKE")
-          knexOperation.where(key, "LIKE", `%${body.filter[key].filterTerm}%`);
-        if (column.filter == "eq" && column.type == "integer")
-          knexOperation.where(key, "=", parseInt(body.filter[key].filterTerm));
-        if (column.filter == "eq" && column.type == "number")
-          knexOperation.where(
-            key,
-            "=",
-            parseFloat(body.filter[key].filterTerm)
-          );
-        if (column.filter == "eq" && column.type == "string")
-          knexOperation.where(key, "=", body.filter[key].filterTerm);
-        if (
-          column.filter == "BETWEEN" &&
-          (column.subType == "date" || column.subType == "timestamp")
-        )
-          knexOperation.whereBetween(key, [
-            body.filter[key].filterTerm.start,
-            body.filter[key].filterTerm.end
-          ]);
-      }
-    });
-    return knexOperation;
-  }
-
-  getActionFor(table, fieldOrAction, fallback) {
+  getActionFor(table, actionNameOrAction, fallback) {
     var Action;
-    if (typeof fieldOrAction != "string") return fieldOrAction;
 
-    var exists = actionExists(table, fieldOrAction);
-    if (exists) Action = requireAction(table, fieldOrAction);
-    else if (typeof fallback != "string") return fallback;
-    else if (
-      ["Action", "Create", "Destroy", "Query", "Update", "BulkUpdate"].indexOf(
-        fallback
-      ) > -1
-    )
-      Action = require(`./base${fallback}Action`);
-
-    if (Action) Action.table = table;
-    return Action;
+    try {
+      if (typeof actionNameOrAction != "string") {
+        Action = actionNameOrAction;
+      } else {
+        var exists = actionExists(table, actionNameOrAction);
+        if (exists) Action = requireAction(table, actionNameOrAction);
+        else if (typeof fallback != "string") return fallback;
+        else if (
+          [
+            "Action",
+            "Create",
+            "Destroy",
+            "Query",
+            "Update",
+            "BulkUpdate"
+          ].indexOf(fallback) > -1
+        )
+          Action = require(`./base${fallback}Action`);
+      }
+      Action.table = table;
+      Action.operation = this;
+      return Action;
+    } catch (e) {
+      console.log(e, e.stack);
+      throw new Errors.SERVER_ERROR(e.message, "Error loading module");
+    }
   }
 
-  getActionAndInvoke(table, fieldOrAction, body) {
-    var Action = this.getActionFor(table, fieldOrAction);
-    Action.table = table;
-    var actionInstance = new Action(this.user, this.knex, this.context);
-    actionInstance.table = table;
-    return actionInstance.execute(table, body);
+  getActionInstance(table, Action) {
+    var action = new Action(this.user, this.knex, this.context);
+    action.operation = this;
+    action.table = table;
+    return action;
+  }
+
+  getActionAndInvoke(table, actionName, body, checkSecurity) {
+    var Action = this.getActionFor(table, actionName);
+    var action = this.getActionInstance(table, Action);
+    if (checkSecurity)
+      Security.checkAction(
+        table,
+        this.user,
+        { secure: true },
+        actionName.name ? actionName.name : actionName,
+        action
+      );
+
+    return action.execute(table, body);
   }
 
   async saveAudit(id, action, values = {}) {
@@ -1026,17 +275,6 @@ class ApiOperation {
     return true;
   }
 
-  toMultiTenantQuery(query, order, limit) {
-    if (!this.multiTenantObject) return query;
-    return query;
-  }
-
-  createTransaction() {
-    const promisify = fn =>
-      new Promise((resolve, reject) => fn(resolve).catch(reject));
-    return promisify(this.knex.transaction);
-  }
-
   get user() {
     return this._user;
   }
@@ -1052,47 +290,6 @@ class ApiOperation {
   set knex(ignore) {
     return;
   }
-
-  get multiTenantObject() {
-    return this._multiTenantObject;
-  }
-
-  set multiTenantObject(isIt) {
-    this._multiTenantObject = isIt;
-  }
 }
-
-String.prototype.pad = function(size) {
-  var s = String(this);
-  while (s.length < (size || 2)) {
-    s = "0" + s;
-  }
-  return s;
-};
-
-Number.prototype.pad = function(size) {
-  var s = String(this);
-  while (s.length < (size || 2)) {
-    s = "0" + s;
-  }
-  return s;
-};
-
-String.prototype.pad = function(size) {
-  var s = String(this);
-  while (s.length < (size || 2)) {
-    s = "0" + s;
-  }
-  return s;
-};
-
-Number.prototype.pad = function(size) {
-  var s = String(this);
-
-  while (s.length < (size || 2)) {
-    s = "0" + s;
-  }
-  return s;
-};
 
 module.exports = ApiOperation;

@@ -1,5 +1,6 @@
 var Handler = require("../../src/handler");
-
+const getOperation = require("../../src/@tbos/api/middleware/action")
+  .getOperation;
 function Execute(
   event,
   operationName,
@@ -13,6 +14,7 @@ function Execute(
 ) {
   const knex = require("../../src/@tbos/api/apiHelpers/knex")();
   const context = {
+    getOperation: getOperation,
     callbackWaitsForEmptyEventLoop: function() {},
     logGroupName: "/aws/lambda/xxxx-api",
     logStreamName: "2018/12/20/[$LATEST]834d36319095487c954105bd66fc24fd",
@@ -29,17 +31,19 @@ function Execute(
     config: {}
   };
 
-  const getOperation = require("../../src/@tbos/api/middleware/action")
-    .getOperation;
-
   var Operation = getOperation(operationName);
 
   var operation = new Operation(context, context.user, context.knex);
 
   var method = operation[methodName];
   if (!method) {
-    var action = operation.checkAction(methodName);
-    method = operation.executeAction(methodName, action);
+    var Action = operation.getActionFor(operation.table, methodName);
+    if (!Action)
+      throw new Error("[402] no se encontro el metodo " + methodName);
+    method = operation.executeAction(
+      methodName.name ? methodName.name : methodName,
+      Action
+    );
   }
   context.operation = operation;
   context.method = method;

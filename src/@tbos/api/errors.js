@@ -54,10 +54,12 @@ module.exports = {
   },
 
   VALIDATION_WITH_FIELDS_ERROR: class VALIDATION_WITH_FIELDS_ERROR extends Error {
-    constructor(message, errorArray) {
+    constructor(errorArray, errorsText, body) {
       super();
-      this.message = message;
-      this.title = "Data not valid";
+      this.message = errorsText(errorArray, {
+        separator: ","
+      }).replace(new RegExp("data.", "g"), "");
+      this.title = "Validation Error";
       this.errors = errorArray;
       this.type = "VALIDATION_WITH_FIELDS_ERROR";
       this.status = 400;
@@ -68,8 +70,7 @@ module.exports = {
     constructor(table, id) {
       super();
       this.message = `${id} not found on ${table} to update`;
-      this.title = `${table} and ${id} could not be found`;
-
+      this.title = "Update Error";
       this.type = "UPDATE_WITHOUT_RESULT";
       this.status = 400;
     }
@@ -79,7 +80,7 @@ module.exports = {
     constructor(table, id = "") {
       super();
       this.message = `${id} not found on ${table}`;
-      this.title = "Id provided not found";
+      this.title = "Id not found";
       this.type = "ITEM_NOT_FOUND";
       this.status = 404;
     }
@@ -88,7 +89,7 @@ module.exports = {
   INTEGRATION_ERROR: class INTEGRATION_ERROR extends Error {
     constructor(message) {
       super();
-      this.title = "Developer induced error";
+      this.title = "Developer or Code Error";
       this.message = message;
       this.type = "INTEGRATION_ERROR";
       this.status = 500;
@@ -109,10 +110,10 @@ module.exports = {
     constructor(message, fields) {
       super();
 
-      this.title = "AUTH_ERROR";
+      this.title = "Authentication Error";
       this.message = message;
       this.solution = "ADMIN";
-      this.type = "LOGIN_ERROR";
+      this.type = "AUTH_ERROR";
       this.status = 401;
     }
   }
